@@ -1,6 +1,7 @@
 (define-module (arguile))
-(export mac def)
+(export mac def module use)
 
+;;; TODO allow mac to not require double parens
 (define-syntax mac
   (syntax-rules ()
     ((mac keyword ((_keyword . pattern) template) ...)
@@ -15,3 +16,8 @@
    (define (name arg ...) exp rest ...))
   ((def name val) (define name val)))
 
+(mac module
+  ((module (base ext ...)) (define-module (base ext ...)))
+  ((module base ext ...) (module (base ext ...))))
+
+(mac use ((use modules) (use-modules modules)))
