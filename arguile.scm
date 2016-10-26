@@ -36,3 +36,13 @@
    (letM ((var val)) body body* ...))
   ((with (var val rest ...) body body* ...)
    (letM ((var val)) (with (rest ...) body body* ...))))
+
+(mac do
+  ((do expr expr* ...) (begin expr expr* ...)))
+
+(mac =
+  ((= var val)
+   (set! var val))
+  ((= var val rest ...)
+   (do (set! var val)
+       (= rest ...))))
