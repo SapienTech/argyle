@@ -1,7 +1,7 @@
 (define-module (arguile))
-(export mac def module use fn)
+(use-modules (arguile guile))
+(export mac def module use fn let with)
 
-;;; TODO allow mac to not require double parens
 (define-syntax mac
   (syntax-rules ()
     ((mac keyword ((_keyword . pattern) template) ...)
@@ -26,3 +26,13 @@
 (mac fn
   ((fn (args ...) body body* ...)
    (lambda (args ...) body body* ...)))
+
+(mac let
+  ((let var val body body* ...)
+   (with (var val) body body* ...)))
+
+(mac with
+  ((with (var val) body body* ...)
+   (letM ((var val)) body body* ...))
+  ((with (var val rest ...) body body* ...)
+   (letM ((var val)) (with (rest ...) body body* ...))))
