@@ -7,7 +7,8 @@
 (re-export fold reduce match receive
            delay lazy force eager promise?)
 (export mac def module use fn
-        let with do = \\ pr prn)
+        let with do = \\ pr prn
+        err type coerce)
 
 (define-syntax mac
   (syntax-rules ()
@@ -19,8 +20,8 @@
        (syntax-rules (aux ...) ((_keyword . pattern) template) ...)))))
 
 (mac def
-  ((def name (arg ...) exp rest ...)
-   (define (name arg ...) exp rest ...))
+  ((def name args exp exp* ...)
+   (define name (lambda args exp exp* ...)))
   ((def name val)
    (define name val)))
 
@@ -32,8 +33,8 @@
 
 ;;; Make anaphoric
 (mac fn
-  ((fn (args ...) body body* ...)
-   (lambda (args ...) body body* ...)))
+  ((fn args body body* ...)
+   (lambda args body body* ...)))
 
 (mac let
   ((let var val body body* ...)
@@ -64,6 +65,8 @@
 (mac prn
   ((prn arg arg* ...) (do (pr arg arg* ...) (newline))))
 
+(def err error)
+
 (def type (x)
  (cond
   ((null? x)          'sym)
@@ -76,52 +79,58 @@
   ((char? x)          'chr)
   ((vector? x)        'vec)
   ((keyword? x)       'kword)
-  (#t                 (error "Type: unknown (or not included) type" x))))
+  (#t                 (err "Type: unknown (or not included) type" x))))
 
+(def iround (compose inexact->exact round))
+
+;;; Allow table to be easily extended
 (def coercions
+  ;; define ret, which returns specified val
   (let coercions (make-hash-table)
     (for-each
-     (lambda (e)
-       (let ((target-type (car e))
-             (conversions (make-hash-table)))
+     (fn (e)
+       (with (target-type (car e)
+              conversions (make-hash-table))
          (hash-set! coercions target-type conversions)
          (for-each
-          (lambda (x) (hash-set! conversions (car x) (cadr x)))
+          (fn (x) (hash-set! conversions (car x) (cadr x)))
           (cdr e))))
-     `((fn (str ,(lambda (s) (lambda (i) (string-ref s i))))
-           (table  ,(lambda (h)
+     `((fn (str ,(fn (s) (fn (i) (string-ref s i))))
+           (table  ,(fn (h)
                       (case-lambda
                         ((k) (hash-ref h k 'nil))
                         ((k d) (hash-ref h k d)))))
-           (vec ,(lambda (v) (lambda (i) (vector-ref v i)))))
+           (vec ,(fn (v) (fn (i) (vector-ref v i)))))
        
        (str (int ,number->string)
             (num ,number->string)
             (chr ,string)
-            (sym ,(lambda (x) (if (eqv? x 'nil) "" (symbol->string x)))))
+            (sym ,(fn (x) (if (eqv? x 'nil) "" (symbol->string x)))))
        
        (sym (str ,string->symbol)
-            (chr ,(lambda (c) (string->symbol (string c)))))
+            (chr ,(fn (c) (string->symbol (string c)))))
        
-       (int (chr ,(lambda (c . args) (char->ascii c)))
-            (num ,(lambda (x . args) (iround x)))
-            (str ,(lambda (x . args)
-                    (let ((n (apply string->number x args)))
+       (int (chr ,(fn (c . args) (char->integer c)))
+            (num ,(fn (x . args) (iround x)))
+            (str ,(fn (x . args)
+                    (let n (apply string->number x args)
                       (if n (iround n)
                           (err "Can't coerce " x 'int))))))
        
-       (num (str ,(lambda (x . args)
+       (num (str ,(fn (x . args)
                     (or (apply string->number x args)
                         (err "Can't coerce " x 'num))))
-            (int ,(lambda (x) x)))
+            (int ,(fn (x) x)))
        
-       (chr (int ,ascii->char)
-            (num ,(lambda (x) (ascii->char (iround x)))))))))
+       (chr (int ,integer->char)
+            (num ,(fn (x) (integer->char
+                           (iround x)))))))
+    coercions))
 
-(define (coerce x type . args)
-  (let ((x-type (ar-type x)))
-    (if (eqv? type x-type) x
-        (let* ((fail (lambda () (err "Can't coerce " x type)))
-               (conversions (hash-ref coercions type fail))
-               (converter (hash-ref conversions x-type fail)))
+(def coerce (x to-type . args)
+  (let x-type (type x)
+    (if (eqv? to-type x-type) x
+        (with (fail (fn () (err "Can't coerce " x to-type))
+               conversions (hash-ref coercions to-type fail)
+               converter (hash-ref conversions x-type fail))
           (apply converter (cons x args))))))
