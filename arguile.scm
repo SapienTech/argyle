@@ -1,6 +1,13 @@
 (define-module (arguile))
-(use-modules (arguile guile))
-(export mac def module use fn let with do = \\ pr prn)
+(use-modules (arguile guile)
+             (srfi srfi-1)
+             (ice-9 match)
+             (ice-9 receive)
+             (srfi srfi-45))
+(re-export fold reduce match receive
+           delay lazy force eager promise?)
+(export mac def module use fn
+        let with do = \\ pr prn)
 
 (define-syntax mac
   (syntax-rules ()
