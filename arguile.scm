@@ -63,3 +63,65 @@
 
 (mac prn
   ((prn arg arg* ...) (do (pr arg arg* ...) (newline))))
+
+(def type (x)
+ (cond
+  ((null? x)          'sym)
+  ((string? x)        'str)
+  ((number? x)        'num)
+  ((procedure? x)     'fn)
+  ((pair? x)          'pair)
+  ((symbol? x)        'sym)
+  ((hash-table? x)    'table)
+  ((char? x)          'chr)
+  ((vector? x)        'vec)
+  ((keyword? x)       'kword)
+  (#t                 (error "Type: unknown (or not included) type" x))))
+
+(def coercions
+  (let coercions (make-hash-table)
+    (for-each
+     (lambda (e)
+       (let ((target-type (car e))
+             (conversions (make-hash-table)))
+         (hash-set! coercions target-type conversions)
+         (for-each
+          (lambda (x) (hash-set! conversions (car x) (cadr x)))
+          (cdr e))))
+     `((fn (str ,(lambda (s) (lambda (i) (string-ref s i))))
+           (table  ,(lambda (h)
+                      (case-lambda
+                        ((k) (hash-ref h k 'nil))
+                        ((k d) (hash-ref h k d)))))
+           (vec ,(lambda (v) (lambda (i) (vector-ref v i)))))
+       
+       (str (int ,number->string)
+            (num ,number->string)
+            (chr ,string)
+            (sym ,(lambda (x) (if (eqv? x 'nil) "" (symbol->string x)))))
+       
+       (sym (str ,string->symbol)
+            (chr ,(lambda (c) (string->symbol (string c)))))
+       
+       (int (chr ,(lambda (c . args) (char->ascii c)))
+            (num ,(lambda (x . args) (iround x)))
+            (str ,(lambda (x . args)
+                    (let ((n (apply string->number x args)))
+                      (if n (iround n)
+                          (err "Can't coerce " x 'int))))))
+       
+       (num (str ,(lambda (x . args)
+                    (or (apply string->number x args)
+                        (err "Can't coerce " x 'num))))
+            (int ,(lambda (x) x)))
+       
+       (chr (int ,ascii->char)
+            (num ,(lambda (x) (ascii->char (iround x)))))))))
+
+(define (coerce x type . args)
+  (let ((x-type (ar-type x)))
+    (if (eqv? type x-type) x
+        (let* ((fail (lambda () (err "Can't coerce " x type)))
+               (conversions (hash-ref coercions type fail))
+               (converter (hash-ref conversions x-type fail)))
+          (apply converter (cons x args))))))
