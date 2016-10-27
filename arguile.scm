@@ -46,3 +46,6 @@
   ((= var val rest ...)
    (do (set! var val)
        (= rest ...))))
+
+(mac \\
+  ((\\ proc args ...) (cut proc args ...)))
