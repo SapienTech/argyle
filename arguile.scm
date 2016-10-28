@@ -8,7 +8,7 @@
            delay lazy force eager promise?)
 (export mac def module use fn
         let with do = \\ pr prn
-        err type coerce apply +)
+        err type coerce apply + len)
 
 (define-syntax mac
   (syntax-rules ()
@@ -150,3 +150,9 @@
          (apply string-append
                 (map (\\ coerce _ 'str) args)))
         (else (apply _+ args))))
+
+(def len (x)
+  (cond ((string? x) (string-length x))
+        ((hash-table? x) (hash-count (const #t) x))
+        ((vector? x) (vector-length x))
+        (else (length x))))
