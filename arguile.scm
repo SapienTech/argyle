@@ -8,7 +8,7 @@
            delay lazy force eager promise?)
 (export mac def module use fn
         let with do = \\ pr prn
-        err type coerce)
+        err type coerce apply +)
 
 (define-syntax mac
   (syntax-rules ()
@@ -137,3 +137,16 @@
 
 (def apply (fn args)
   (_apply (coerce fn 'fn) args))
+
+(def one-of (tests val)
+  (if (null? tests) #f
+      (or ((car tests) val)
+          (one-of (cdr tests) val))))
+
+;;; Consider using goops for this or as an extension
+(def + args
+  (cond ((null? args) 0)
+        ((one-of `(,string? ,char?) (car args))
+         (apply string-append
+                (map (\\ coerce _ 'str) args)))
+        (else (apply _+ args))))
