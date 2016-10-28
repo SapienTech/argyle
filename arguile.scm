@@ -1,15 +1,17 @@
 (define-module (arguile))
 (use-modules (arguile guile)
+             (arguile data)
              (srfi srfi-1)
              (ice-9 match)
              (ice-9 receive)
              (srfi srfi-45))
 (re-export fold reduce match receive
            delay lazy force eager promise?
-           newtype)
+           data make data-match)
 (export mac def module use fn
         let with do = \\ pr prn
-        err type coerce apply + len)
+        err type coerce apply + len
+        newtype)
 
 (define-syntax mac
   (syntax-rules ()
