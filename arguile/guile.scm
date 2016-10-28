@@ -1,10 +1,12 @@
 (define-module (arguile guile))
-(export-syntax letM cut)
+(export-syntax _let _apply cut)
 
-(define-syntax letM
+(define-syntax _let
   (syntax-rules ()
-   ((letM args body ...)
+   ((_let args body ...)
     (let args body ...))))
+
+(define _apply apply)
 
 (define-syntax cut
   (lambda (stx)

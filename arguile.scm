@@ -42,9 +42,9 @@
 
 (mac with
   ((with (var val) body body* ...)
-   (letM ((var val)) body body* ...))
+   (_let ((var val)) body body* ...))
   ((with (var val rest ...) body body* ...)
-   (letM ((var val)) (with (rest ...) body body* ...))))
+   (_let ((var val)) (with (rest ...) body body* ...))))
 
 (mac do
   ((do expr expr* ...) (begin expr expr* ...)))
@@ -56,7 +56,7 @@
        (= rest ...))))
 
 (mac \\
-  ((\\ proc args ...) (cut proc args ...)))
+  ((\\ fn args ...) (cut fn args ...)))
 
 (mac pr
   ((pr arg) (display arg))
@@ -98,8 +98,8 @@
      `((fn (str ,(fn (s) (fn (i) (string-ref s i))))
            (table  ,(fn (h)
                       (case-lambda
-                        ((k) (hash-ref h k 'nil))
-                        ((k d) (hash-ref h k d)))))
+                        ((k) (hash-ref h k))
+                        ((k v) (hash-set! h k v)))))
            (vec ,(fn (v) (fn (i) (vector-ref v i)))))
        
        (str (int ,number->string)
@@ -113,12 +113,12 @@
        (int (chr ,(fn (c . args) (char->integer c)))
             (num ,(fn (x . args) (iround x)))
             (str ,(fn (x . args)
-                    (let n (apply string->number x args)
+                    (let n (apply string->number '(x args))
                       (if n (iround n)
                           (err "Can't coerce " x 'int))))))
        
        (num (str ,(fn (x . args)
-                    (or (apply string->number x args)
+                    (or (apply string->number '(x args))
                         (err "Can't coerce " x 'num))))
             (int ,(fn (x) x)))
        
@@ -134,3 +134,6 @@
                conversions (hash-ref coercions to-type fail)
                converter (hash-ref conversions x-type fail))
           (apply converter (cons x args))))))
+
+(def apply (fn args)
+  (_apply (coerce fn 'fn) args))
