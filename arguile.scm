@@ -5,7 +5,8 @@
              (ice-9 receive)
              (srfi srfi-45))
 (re-export fold reduce match receive
-           delay lazy force eager promise?)
+           delay lazy force eager promise?
+           newtype)
 (export mac def module use fn
         let with do = \\ pr prn
         err type coerce apply + len)
@@ -156,3 +157,8 @@
         ((hash-table? x) (hash-count (const #t) x))
         ((vector? x) (vector-length x))
         (else (length x))))
+
+;;; TODO:: allow easy default field accessors
+(mac newtype
+  ((newtype name ctor pred fields ...)
+   (define-record-type name ctor pred fields ...)))
