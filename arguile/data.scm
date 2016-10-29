@@ -117,6 +117,8 @@ handle this case:
 
 ;;; TODO:: merge data-match with match
 (define-module (arguile data)
+  #:use-module (arguile data table)
+  #:re-export (make-table)
   #:export (make data data-match))
 
 (define (%adt-branch adt-name variant-name num-elts)

@@ -9,7 +9,8 @@
              (srfi srfi-45))
 (re-export fold reduce match receive
            delay lazy force eager promise?
-           data make data-match)
+           data data-match)
+                                        ;TODO: Add export syntax
 (export mac def module use fn
         let with do = \\ pr prn
         err type coerce apply + len
@@ -30,13 +31,13 @@
   ((def name val)
    (define name val)))
 
-(mac module
+#!(mac module
   ((module (base ext ...)) (define-module (base ext ...)))
   ((module base ext ...) (module (base ext ...))))
 
 (mac use ((use modules) (use-modules modules)))
-
-;;; Make anaphoric
+!#
+                                        ;TODO: Make anaphoric
 (mac fn
   ((fn args body body* ...)
    (lambda args body body* ...)))
@@ -88,9 +89,9 @@
 
 (def iround (compose inexact->exact round))
 
-;;; Allow table to be easily extended
+                                        ;TODO: Allow extension
 (def coercions
-  ;; define ret, which returns specified val
+                                        ;TODO: def ret, returns specified val
   (let coercions (make-hash-table)
     (for-each
      (fn (e)
@@ -148,7 +149,7 @@
       (or ((car tests) val)
           (one-of (cdr tests) val))))
 
-;;; Consider using goops for this or as an extension
+                                        ;TODO: Use goops?
 (def + args
   (cond ((null? args) 0)
         ((one-of `(,string? ,char?) (car args))
@@ -162,7 +163,7 @@
         ((vector? x) (vector-length x))
         (else (length x))))
 
-;;; TODO:: allow easy default field accessors
+                                        ;TODO: provide default field accessors
 (mac newtype
   ((newtype name ctor pred fields ...)
    (define-record-type name ctor pred fields ...)))
