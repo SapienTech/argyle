@@ -1,6 +1,8 @@
 (define-module (arguile))
 (use-modules (arguile guile)
              (arguile data)
+             (arguile loop)
+             (arguile nested-loop)
              (srfi srfi-1)
              (ice-9 match)
              (ice-9 receive)
