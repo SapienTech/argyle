@@ -18,7 +18,6 @@ In all, it provides three functions:
  - match, which destructs values of an algebraic data type
 
                          Algebraic Data Types
-
 We're all familiar with the *record* type, which is a data structure
 which stores multiple values (fields) together in one structure.
 Algebraic data types extend this notion to a value which stores one of
@@ -118,7 +117,7 @@ handle this case:
 
 ;;; TODO:: merge data-match with match
 (define-module (arguile data)
-  #:export make data data-match)
+  #:export (make data data-match))
 
 (define (%adt-branch adt-name variant-name num-elts)
   (lambda (op . args)
