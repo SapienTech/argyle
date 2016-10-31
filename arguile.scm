@@ -19,9 +19,12 @@
 (define-syntax mac
   (syntax-rules ()
     ((mac keyword ((_ . pattern) template) ...)
-     (mac keyword () ((_ . pattern) template) ...))
-    ((mac keyword (aux ...)
-          ((_ . pattern) template) ...)
+     (mac keyword () x ((_ . pattern) template) ...))
+    ((mac keyword (aux ...) ((_ . pattern) template) ...)
+     (mac keyword (aux ...) x ((_ . pattern) template) ...))
+    ((mac keyword x ((_ . pattern) template) ...)
+     (mac keyword () x ((_ . pattern) template) ...))
+    ((mac keyword (aux ...) x ((_ . pattern) template) ...)
      (define-syntax keyword
        (lambda (x)
          (syntax-case x (aux ...)
