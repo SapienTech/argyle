@@ -18,6 +18,17 @@
 
 (define-syntax mac
   (syntax-rules ()
+    ((mac keyword ((_ . pattern) template) ...)
+     (mac keyword () ((_ . pattern) template) ...))
+    ((mac keyword (aux ...)
+          ((_ . pattern) template) ...)
+     (define-syntax keyword
+       (lambda (x)
+         (syntax-case x (aux ...)
+           ((_ . pattern) template) ...))))))
+
+(define-syntax mac-old
+  (syntax-rules ()
     ((mac keyword ((_keyword . pattern) template) ...)
      (mac keyword () ((_keyword . pattern) template) ...))
     ((mac keyword (aux ...)
@@ -27,49 +38,43 @@
 
 (mac def
   ((def name args exp exp* ...)
-   (define name (lambda args exp exp* ...)))
+   #'(define name (lambda args exp exp* ...)))
   ((def name val)
-   (define name val)))
+   #'(define name val)))
 
-#!(mac module
-  ((module (base ext ...)) (define-module (base ext ...)))
-  ((module base ext ...) (module (base ext ...))))
-
-(mac use ((use modules) (use-modules modules)))
-!#
                                         ;TODO: Make anaphoric
 (mac fn
   ((fn args body body* ...)
-   (lambda args body body* ...)))
+   #'(lambda args body body* ...)))
 
 (mac let
   ((let var val body body* ...)
-   (with (var val) body body* ...)))
+   #'(with (var val) body body* ...)))
 
 (mac with
   ((with (var val) body body* ...)
-   (_let ((var val)) body body* ...))
+   #'(_let ((var val)) body body* ...))
   ((with (var val rest ...) body body* ...)
-   (_let ((var val)) (with (rest ...) body body* ...))))
+   #'(_let ((var val)) (with (rest ...) body body* ...))))
 
 (mac do
-  ((do expr expr* ...) (begin expr expr* ...)))
+  ((do expr expr* ...) #'(begin expr expr* ...)))
 
 (mac =
-  ((= var val) (set! var val))
+  ((= var val) #'(set! var val))
   ((= var val rest ...)
-   (do (set! var val)
-       (= rest ...))))
+   #'(do (set! var val)
+         (= rest ...))))
 
 (mac \\
-  ((\\ fn args ...) (cut fn args ...)))
+  ((\\ fn args ...) #'(cut fn args ...)))
 
 (mac pr
-  ((pr arg) (display arg))
-  ((pr arg arg* ...) (do (display arg) (pr arg* ...))))
+  ((pr arg) #'(display arg))
+  ((pr arg arg* ...) #'(do (display arg) (pr arg* ...))))
 
 (mac prn
-  ((prn arg arg* ...) (do (pr arg arg* ...) (newline))))
+  ((prn arg arg* ...) #(do (pr arg arg* ...) (newline))))
 
 (def err error)
 
@@ -166,4 +171,4 @@
                                         ;TODO: provide default field accessors
 (mac newtype
   ((newtype name ctor pred fields ...)
-   (define-record-type name ctor pred fields ...)))
+   #'(define-record-type name ctor pred fields ...)))
