@@ -1,8 +1,9 @@
 (define-module (arguile sugar))
 
 (use-modules (arguile ssyntax)
-             (arguile core)
-             (srfi srfi-26))
+             (arguile guile)
+             (arguile core))
+
 (export-syntax \\ ret)
 
 (mac \\ ((\\ fn args ...) #'(cut fn args ...)))

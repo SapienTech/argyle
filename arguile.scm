@@ -5,7 +5,6 @@
              (arguile loop)
              (arguile nested-loop)
              (arguile io)
-             (arguile error)
              (arguile type)
              (arguile generic)
              (arguile sugar)
@@ -18,7 +17,6 @@
            fn def let with do =
            loop                         ; How to re-export whole module?
            pr prn
-           err
            newtype type coerce
            + len
            \\ ret

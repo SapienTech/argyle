@@ -2,6 +2,7 @@
   #:export (+ len))
 
 (use-modules (arguile core)
+             (arguile type)
              (arguile guile)
              (arguile sugar))
 

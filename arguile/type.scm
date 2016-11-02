@@ -24,7 +24,7 @@
   ((char? x)          'chr)
   ((vector? x)        'vec)
   ((keyword? x)       'kword)
-  (#t                 (err "Type: unknown type" x))))
+  (#t                 (error "Type: unknown type" x))))
 
 (def iround (compose inexact->exact round))
 
@@ -62,11 +62,11 @@
             (str ,(fn (x . args)
                     (let n (apply string->number '(x args))
                       (if n (iround n)
-                          (err "Can't coerce " x 'int))))))
+                          (error "Can't coerce " x 'int))))))
        
        (num (str ,(fn (x . args)
                     (or (apply string->number '(x args))
-                        (err "Can't coerce " x 'num))))
+                        (error "Can't coerce " x 'num))))
             (int ,(fn (x) x)))
        
        (chr (int ,integer->char)
@@ -77,7 +77,7 @@
 (def coerce (x to-type . args)
   (let x-type (type x)
     (if (eqv? to-type x-type) x
-        (with (fail (fn () (err "Can't coerce " x to-type))
+        (with (fail (fn () (error "Can't coerce " x to-type))
                conversions (hash-ref coercions to-type fail)
                converter (hash-ref conversions x-type fail))
           (apply converter (cons x args))))))
