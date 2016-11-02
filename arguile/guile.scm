@@ -3,8 +3,8 @@
 
 (define-syntax _let
   (syntax-rules ()
-   ((_let args body ...)
-    (let args body ...))))
+   ((_let args e1 ...)
+    (let args e1 ...))))
 
 (define _apply apply)
 
