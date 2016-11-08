@@ -1,5 +1,7 @@
 (define-module (arguile ssyntax)
-  #:export (mac syn syn-case w/syn))
+  #:export (mac syn syn-case w/syn
+            syn->dat dat->syn))
+(use-modules (srfi srfi-1))
 
 (define-syntax mac
   (lambda (ctx)
@@ -18,15 +20,21 @@
                ((_ . patt) templ) ...)))))))
 
 (mac syn-case
-     ;; May not handle all cases
   ((_ ctx (aux ...) ((kword . patt) templ) ...)
    #'(syntax-case ctx (aux ...)
-     ((kword . patt) templ) ...)))
+       ((kword . patt) templ) ...)))
 
 (mac w/syn
-  ((_ () e1 e2 ...)
-   #'(with () e1 e2 ...))
-  ((_ (syn val) e1 e2 ...)
-   #'(with-syntax ((syn val)) e1 e2 ...))
-  ((_ (syn val rest ...) e1 e2 ...)
-   #'(with-syntax ((syn val)) (w/syn (rest ...) e1 e2 ...))))
+  ((_ (item ...) e1 ...)
+   (with-syntax ((items (group #'(item ...) 2)))
+     #'(with-syntax items e1 ...))))
+
+(define syn->dat syntax->datum)
+(define dat->syn datum->syntax) 
+
+(define (group lst n)
+  ;; Move to other module
+  (let lp ((lst lst) (acc '()))
+    (if (> n (length lst))
+        (reverse (append lst acc))
+        (lp (drop lst 2) (cons (take lst 2) acc)))))
