@@ -6,5 +6,6 @@
 (data table () ()
       (let t (make-hash-table)
         (case-lambda
+          (() t)
           ((k) (hash-ref t k))
           ((k v) (hash-set! t k v)))))
