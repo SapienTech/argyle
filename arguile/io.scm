@@ -9,4 +9,4 @@
   ((pr arg arg* ...) #'(do (display arg) (pr arg* ...))))
 
 (mac prn
-  ((prn arg arg* ...) #(do (pr arg arg* ...) (newline))))
+  ((prn arg arg* ...) #'(do (pr arg arg* ...) (newline))))
