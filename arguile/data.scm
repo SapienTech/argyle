@@ -1,34 +1,31 @@
 ;;; TODO:: merge data-match with match
 (define-module (arguile data)
-  #:export (<data> data? data))
+  #:export (data data-type? data?))
+
 (use-modules (arguile core)
              (arguile ssyntax)
              (arguile generic)
              (arguile sugar)
-             (srfi srfi-9))
+             (arguile data records))
 
-(def <data>
-  ;function: 0, record: 1
-  (make-struct <applicable-struct-vtable> 0 'pwpw))
-(set-struct-vtable-name! <data> '<data>)
-
-(def data? (obj)
-  (or (record? obj)
-      (eq? (struct-vtable obj) <data>)))
-
-;;; Lets hold off from extra features until we implement def*
 (mac data x
-  ((_ name (fields ...) (methods ...) proc ...)
-   (with (proc? (not (null? (syn->dat #'(proc ...))))
+  ((_ name (fields ...) (methods ...) _proc ...)
+   (with (proc? (not (null? (syn->dat #'(_proc ...))))
           name' (syn->dat #'name))
      (w/syn (pred (dat->syn x (+ name' '?))
              const (dat->syn x (+ 'make- name'))
              %const (dat->syn x (+ '%make- name'))
+             proc-get (dat->syn x (+ name' '-proc))
+             proc-set! (dat->syn x (+ name' '-proc-set!))
              self (dat->syn x 'self))
        #`(do (define-record-type name
                (#,(if proc? #'%const #'const) fields ...)
-               pred methods ...)
-             #,(when proc?
-                 #'(def const args
-                     (let self (apply %const args)
-                       (make-struct <data> 0 proc ...)))))))))
+               pred (proc proc-get proc-set!) methods ...)
+           #,(when proc?
+               #'(def const args
+                   (ret self
+                     (apply %const args)
+                     (proc-set! self _proc ...)))))))))
+
+(def data-type? record-type?)
+(def data? record?)
