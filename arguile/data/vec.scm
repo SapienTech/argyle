@@ -4,8 +4,9 @@
              (arguile core)
              (arguile data))
 
-(data vec (len fill) ((len vec-len) (fill vec-fill))
-      (let v (make-vector (vec-len self) (vec-fill self))
+;;; TODO: add optional fill
+(data vec (len) ((len vec-len))
+      (let v (make-vector (vec-len self))
         (case-lambda
           (() v)
           ((k) (vector-ref v k))
