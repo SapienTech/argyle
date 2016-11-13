@@ -1,5 +1,5 @@
 (define-module (arguile core)
-  #:export (fn def let with do =))
+  #:export (fn def let with do = =? 0? 1?))
 (use-modules (arguile guile)
              (arguile ssyntax))
 (mac fn
@@ -24,11 +24,15 @@
   ((_ (var val rest ...) e1 e2 ...)
    #'(_let ((var val)) (with (rest ...) e1 e2 ...))))
 
-(mac do
-  ((do e1 e2 ...) #'(begin e1 e2 ...)))
+(mac do ((_ e1 ...) #'(begin e1 ...)))
 
+;;; TODO: check if var is a free variable, and if so, define it
 (mac =
-  ((= var val) #'(set! var val))
-  ((= var val rest ...)
+  ((_ var val) #'(set! var val))
+  ((_ var val rest ...)
    #'(do (set! var val)
          (= rest ...))))
+
+(def =? _=)
+(def 0? zero?)
+(def 1? (n) (=? 1 n))
