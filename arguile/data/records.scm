@@ -1,6 +1,6 @@
-(define-module (arguile data records)
-  #:use-module (srfi srfi-1)
-  #:use-module (system base ck)
+(module (arguile data records)
+  #:use (srfi srfi-1)
+  #:use (system base ck)
   #:export (define-record-type record record? record-type?))
 
 ;; 0: type-name, 1: fields, 2: constructor

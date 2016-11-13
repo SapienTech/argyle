@@ -1,10 +1,10 @@
-(define-module (arguile generic)
+(module (arguile generic)
   #:export (+ * len))
 
-(use-modules (arguile core)
-             (arguile type)
-             (arguile guile)
-             (arguile sugar))
+(use (arguile core)
+     (arguile type)
+     (arguile guile)
+     (arguile sugar))
 
 ;;; TODO: goops instead?
 

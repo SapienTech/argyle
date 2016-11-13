@@ -196,7 +196,7 @@ handle this case:
 
 ;;; Not sure how im going to make this work... check out guile source
 #!(mac module
-  ((module (base ext ...)) (define-module (base ext ...)))
+  ((module (base ext ...)) (define-module(base ext ...)))
   ((module base ext ...) (module (base ext ...))))
 
 (mac use ((use modules) (use-modules modules)))

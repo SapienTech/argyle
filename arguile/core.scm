@@ -1,7 +1,7 @@
-(define-module (arguile core)
+(module (arguile core)
   #:export (fn def let with do = =? 0? 1?))
-(use-modules (arguile guile)
-             (arguile ssyntax))
+(use (arguile guile)
+     (arguile ssyntax))
 (mac fn
   ((_ args e1 e2 ...)
    #'(lambda args e1 e2 ...)))

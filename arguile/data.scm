@@ -1,12 +1,12 @@
 ;;; TODO:: merge data-match with match
-(define-module (arguile data)
+(module (arguile data)
   #:export (data data-type? data?))
 
-(use-modules (arguile core)
-             (arguile ssyntax)
-             (arguile generic)
-             (arguile sugar)
-             (arguile data records))
+(use (arguile core)
+     (arguile ssyntax)
+     (arguile generic)
+     (arguile sugar)
+     (arguile data records))
 
 (mac data x
   ((_ name (fields ...) (methods ...) _proc ...)

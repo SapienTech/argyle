@@ -1,7 +1,7 @@
-(define-module (arguile ssyntax)
+(module (arguile ssyntax)
   #:export (mac syn syn-case w/syn
             syn->dat dat->syn))
-(use-modules (srfi srfi-1))
+(use (srfi srfi-1))
 
 (define-syntax mac
   (lambda (ctx)

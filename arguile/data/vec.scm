@@ -1,8 +1,8 @@
-(define-module (arguile data vec)
+(module (arguile data vec)
   #:export (make-vec))
-(use-modules (arguile ssyntax)
-             (arguile core)
-             (arguile data))
+(use (arguile ssyntax)
+     (arguile core)
+     (arguile data))
 
 ;;; TODO: add optional fill
 (data vec (len) ((len vec-len))

@@ -1,11 +1,11 @@
-(define-module (arguile type)
+(module (arguile type)
   #:export (newtype type coerce))
-(use-modules (arguile ssyntax)
-             (arguile core)
-             (arguile guile)
-             (arguile error)
-             (arguile sugar)
-             (srfi srfi-9))
+(use (arguile ssyntax)
+     (arguile core)
+     (arguile guile)
+     (arguile error)
+     (arguile sugar)
+     (srfi srfi-9))
 
 (mac newtype
      ;;TODO: provide default field accessors

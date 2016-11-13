@@ -1,4 +1,4 @@
-(define-module (arguile guile))
+(module (arguile guile))
 (export _+ _= _apply)
 (export-syntax _let cut)
 

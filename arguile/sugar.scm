@@ -1,8 +1,8 @@
-(define-module (arguile sugar))
+(module (arguile sugar))
 
-(use-modules (arguile ssyntax)
-             (arguile guile)
-             (arguile core))
+(use (arguile ssyntax)
+     (arguile guile)
+     (arguile core))
 
 (export-syntax \\ ret)
 

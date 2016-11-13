@@ -1,24 +1,24 @@
-(define-module (arguile data queue)
+(module (arguile data queue)
   #:export (make-q q?
             q-len queue-null?
             enq! deq!
             queue-empty-condition?
             lst->q q->lst))
 
-(use-modules (arguile ssyntax)
-             (arguile core)
-             (arguile generic)
-             (arguile data)
-             (rnrs conditions))
+(use (arguile ssyntax)
+     (arguile core)
+     (arguile generic)
+     (arguile data)
+     (rnrs conditions))
 
 (data queue (len head tail)
-      ((len q-len q-len!)
-       (head q-head q-head!)
-       (tail q-tail q-tail!))
-
-      (case-lambda
-        (() (deq! self))
-        ((k) (enq! self k))))
+  ((len q-len q-len!)
+   (head q-head q-head!)
+   (tail q-tail q-tail!))
+  
+  (case-lambda
+    (() (deq! self))
+    ((k) (enq! self k))))
 
 (def make-q ()
   (make-queue 0 '() '()))

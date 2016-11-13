@@ -1,8 +1,8 @@
-(define-module (arguile io)
+(module (arguile io)
   #:export (pr prn))
 
-(use-modules (arguile ssyntax)
-             (arguile core))
+(use (arguile ssyntax)
+     (arguile core))
 
 (mac pr
   ((pr arg) #'(display arg))

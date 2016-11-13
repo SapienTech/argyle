@@ -1,5 +1,5 @@
-(define-module (arguile error)
+(module (arguile error)
   #:export (err))
-(use-modules (arguile core))
+(use (arguile core))
 
 (def err error)
