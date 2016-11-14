@@ -1,12 +1,22 @@
 (module (arguile generic)
   #:export (+ * len))
 
-(use (arguile core)
+(use (oop goops)
+     (arguile ssyntax)
+     (arguile core)
      (arguile type)
      (arguile guile)
      (arguile sugar))
 
-;;; TODO: goops instead?
+(mac generic
+  ((_ name) #'(define-generic name)))
+
+;;; TODO: allow multiple declarations
+(mac extend
+  ((_ ((setter name) . args) body ...)
+   #'(define-method ((setter name) . args) body ...))
+  ((_ name (args ...) body ...)
+   #'(define-method (name args ...) body ...)))
 
 (def + args
   (cond ((null? args) 0)
@@ -18,6 +28,7 @@
                 (map (\\ coerce _ 'sym) args)))
         (else (apply _+ args))))
 
+;;; Add cartesian product for data
 (def * args
   (cond ((null? args) 0)
         ((one-of `(,string? ,char?) (car args))
@@ -42,3 +53,7 @@
         ((hash-table? x) (hash-count (const #t) x))
         ((vector? x) (vector-length x))
         (else (length x))))
+
+(generic join)
+(extend join ((e1 <list>) (e2 <list>))
+  (append e1 e2))
