@@ -1,16 +1,12 @@
 (module (arguile type)
-  #:export (newtype type coerce))
+  #:export (type coerce ->))
 (use (arguile ssyntax)
      (arguile core)
+     (arguile data table)
      (arguile guile)
      (arguile error)
      (arguile sugar)
      (srfi srfi-9))
-
-(mac newtype
-     ;;TODO: provide default field accessors
-  ((newtype name ctor pred fields ...)
-   #'(define-record-type name ctor pred fields ...)))
 
 (def type (x)
  (cond
@@ -24,31 +20,30 @@
   ((char? x)          'chr)
   ((vector? x)        'vec)
   ((keyword? x)       'kword)
-  (#t                 (error "Type: unknown type" x))))
+  (else               (error "Type: unknown type" x))))
 
-(def iround (compose inexact->exact round))
+(def coerce (x to-type . args)
+  (let x-type (type x)
+    (if (eqv? to-type x-type) x
+        (with (fail (fn () (error "Can't coerce " x to-type))
+               conversions (hash-ref (coercions) to-type fail)
+               converter (hash-ref (conversions) x-type fail))
+          (apply converter (cons x args))))))
+
+(mac -> ((_ type obj args ...) #'(coerce obj 'type args ...)))
 
 (def coercions
-     ;;TODO: Allow extension
-  (ret coercions
-    (make-hash-table)
+    ;;TODO: Allow extension
+  (ret coercions (make-table)
     (for-each
      (fn (e)
        (with (target-type (car e)
-              conversions (make-hash-table))
-         (hash-set! coercions target-type conversions)
+              conversions (make-table))
+         (coercions target-type conversions)
          (for-each
-          (fn (x) (hash-set! conversions (car x) (cadr x)))
+          (fn (x) (conversions (car x) (cadr x)))
           (cdr e))))
      `(
-       ;; TODO: rectify fn coercion w/ applicable-structs
-       (fn (str ,(fn (s) (fn (i) (string-ref s i))))
-           (table  ,(fn (h)
-                      (case-lambda
-                        ((k) (hash-ref h k))
-                        ((k v) (hash-set! h k v)))))
-           (vec ,(fn (v) (fn (i) (vector-ref v i)))))
-       
        (str (int ,number->string)
             (num ,number->string)
             (chr ,string)
@@ -74,10 +69,4 @@
                            (iround x)))))))
     coercions))
 
-(def coerce (x to-type . args)
-  (let x-type (type x)
-    (if (eqv? to-type x-type) x
-        (with (fail (fn () (error "Can't coerce " x to-type))
-               conversions (hash-ref coercions to-type fail)
-               converter (hash-ref conversions x-type fail))
-          (apply converter (cons x args))))))
+(def iround (compose inexact->exact round))
