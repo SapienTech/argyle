@@ -1,6 +1,7 @@
 (module (arguile data queue)
-  #:export (make-q q?
-            q-len queue-null?
+  #:export (make-q q? q-null?
+            q-fn q-fn!
+            q-head q-tail q-len
             enq! deq!
             queue-empty-condition?
             lst->q q->lst))
@@ -31,7 +32,6 @@
 
 (def deq! (q)
   (when (q-null? q)
-    ;; Clean this verbose exp
     (raise (condition
             (make-queue-empty-condition)
             (make-who-condition 'dequeue)
@@ -56,6 +56,7 @@
   (+ (q-head q)
      (reverse (q-tail q))))
 
+;;; TODO: make less verbose
 (define-condition-type &queue-empty
   &assertion
   make-queue-empty-condition
