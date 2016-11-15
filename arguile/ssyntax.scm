@@ -1,5 +1,5 @@
 (module (arguile ssyntax)
-  #:export (mac syn syn-case w/syn
+  #:export (mac syn? syn-case w/syn
             syn->dat dat->syn))
 (use (srfi srfi-1)
      (arguile core)
@@ -21,6 +21,9 @@
            (lambda (x)
              (syntax-case x (aux ...)
                ((_ . patt) templ) ...)))))))
+
+(def syn? (obj)
+  (& (vector? obj) (eq? 'syntax-object (vector-ref obj 0))))
 
 (mac syn-case
   ((_ ctx (aux ...) ((kword . patt) templ) ...)

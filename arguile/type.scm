@@ -5,8 +5,7 @@
      (arguile data table)
      (arguile guile)
      (arguile error)
-     (arguile sugar)
-     (srfi srfi-9))
+     (arguile sugar))
 
 (def type (x)
  (cond
@@ -14,12 +13,13 @@
   ((string? x)        'str)
   ((number? x)        'num)
   ((procedure? x)     'fn)
-  ((pair? x)          'pair)
   ((symbol? x)        'sym)
+  ((syn? x)           'syn)
   ((hash-table? x)    'table)
   ((char? x)          'chr)
   ((vector? x)        'vec)
   ((keyword? x)       'kword)
+  ((pair? x)          'pair)
   (else               (error "Type: unknown type" x))))
 
 (def coerce (x to-type . args)
@@ -44,6 +44,7 @@
           (fn (x) (conversions (car x) (cadr x)))
           (cdr e))))
      `(
+       (dat (syn ,syn->dat))
        (str (int ,number->string)
             (num ,number->string)
             (chr ,string)
