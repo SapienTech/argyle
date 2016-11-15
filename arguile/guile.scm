@@ -1,10 +1,11 @@
 (module (arguile guile))
-(export _+ _= _apply)
+(export _+ _* _= _apply)
 (export-syntax _let cut)
 
 (define _apply apply)
 (define _+ +)
 (define _= =)
+(define _* *)
 
 (define-syntax _let
   (syntax-rules ()

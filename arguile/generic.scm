@@ -1,5 +1,6 @@
 (module (arguile generic)
-  #:export (+ * len))
+  #:export (generic extend
+            + * len join rev))
 
 (use (oop goops)
      (arguile ssyntax)
@@ -57,3 +58,7 @@
 (generic join)
 (extend join ((e1 <list>) (e2 <list>))
   (append e1 e2))
+
+(generic rev)
+(extend rev ((orderable <list>))
+  (reverse orderable))
