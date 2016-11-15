@@ -1,5 +1,5 @@
 (module (arguile core)
-  #:export (fn def let with do fn-case & = =? 0? 1?))
+  #:export (fn def defp let with do fn-case & = =? 0? 1?))
 (use (arguile guile)
      (arguile ssyntax)
      (arguile loop)
@@ -19,6 +19,9 @@
       e1 e2 ...))
   ((_ name val)
    #'(define name val)))
+
+(mac defp
+  ((_ name . rest) #'(do (def name . rest) (export name))))
 
 (mac let
   ((_ var val e1 e2 ...)
