@@ -1,7 +1,7 @@
 (module (arguile data records)
-  #:use (srfi srfi-1)
-  #:use (system base ck)
   #:export (define-record-type record record? record-type?))
+(use (srfi srfi-1)
+     (system base ck))
 
 ;; 0: type-name, 1: fields, 2: constructor
 (define record-type-vtable

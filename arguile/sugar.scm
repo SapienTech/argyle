@@ -1,10 +1,8 @@
 (module (arguile sugar))
-
+(export-syntax \\ ret)
 (use (arguile ssyntax)
      (arguile guile)
      (arguile core))
-
-(export-syntax \\ ret)
 
 (mac \\ ((\\ fn args ...) #'(cut fn args ...)))
 
