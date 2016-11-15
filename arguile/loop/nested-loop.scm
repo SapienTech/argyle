@@ -57,7 +57,7 @@
     ((%NESTED-LOOP looper continuation ((state initial) ...) combiner
          (PARALLEL (iterator ...) ...)
          clause0 clause1+ ...)
-     (looper CONTINUE ((WITH state initial)
+     (looper CONTINUE ((WHERE state initial)
                        ...
                        (iterator ...)
                        ...)

@@ -1,4 +1,4 @@
-;;; loop.sls --- 
+;;; foof-loop.sls --- 
 
 ;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -11,7 +11,6 @@
 ;; program. If not, see <http://www.debian.org/misc/bsd.license>.
 
 ;;; Commentary:
-;; Still need to add anaphoric recur
 
 ;;; Code:
 #!r6rs
@@ -23,9 +22,8 @@
 
     =>
     for
-    with
     until
-    let
+    where
     let-values
     while
 
@@ -55,7 +53,8 @@
     in-string
     in-string-reverse
     in-port
-    in-file)
+    in-file
+    )
   (import
     (rnrs)
     (only (rnrs mutable-pairs) set-cdr!)
@@ -75,12 +74,12 @@
 
   (define-aux
     for
-    with
     to
     by
+    where
     until
     while
     initial)
 
-  (include-file/downcase ((arguile lib loop private) loop))
+  (include-file/downcase ((arguile loop) loop))
 )

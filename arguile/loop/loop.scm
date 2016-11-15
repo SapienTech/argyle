@@ -35,8 +35,8 @@
 ;;; This is a variation on Alex Shinn's looping macros described in
 ;;; message-id <1157562097.001179.11470@i42g2000cwa.googlegroups.com>.
 ;;; It has diverged substantially from the original macros, and is now
-;;; documented at <http://mumble.net/~campbell/tmp/loop.txt> [for
-;;; the beta period of loop version 9].
+;;; documented at <http://mumble.net/~campbell/tmp/foof-loop.txt> [for
+;;; the beta period of foof-loop version 9].
 ;;;
 ;;; This file depends on syn-param.scm, also by Taylor R. Campbell, and
 ;;; SRFI 11 (LET-VALUES).  Ideally, the implementation of LET-VALUES
@@ -193,7 +193,7 @@
 ;;;; The Guts of LOOP
 
 (define-syntax %loop
-  (syntax-rules (=> FOR WITH LET LET-VALUES WHILE UNTIL
+  (syntax-rules (=> FOR WHERE LET LET-VALUES WHILE UNTIL
                     START GO PARSE-FOR CONTINUE FINISH SIMPLIFY-BODY)
 
     ((%LOOP START name loop-clauses body)
@@ -286,20 +286,20 @@
 ;;;;; User-Directed Clauses
 
     ((%LOOP GO name state
-            ((WITH variable initializer) . loop-clauses)
+            ((WHERE variable initializer) . loop-clauses)
             body)
      (SYNTACTIC-ERROR-IF-NOT-NAME variable
-         ("Malformed WITH clause in LOOP:" (WITH variable initializer))
+         ("Malformed WITH clause in LOOP:" (WHERE variable initializer))
        (%LOOP GO name state
-              ((WITH variable initializer variable) . loop-clauses)
+              ((WHERE variable initializer variable) . loop-clauses)
               body)))
 
     ((%LOOP GO name
             ((loop-variable ...) . more-state)
-            ((WITH variable initializer stepper) . loop-clauses)
+            ((WHERE variable initializer stepper) . loop-clauses)
             body)
      (SYNTACTIC-ERROR-IF-NOT-NAME variable
-         ("Malformed WITH clause in LOOP:" (WITH variable initializer stepper))
+         ("Malformed WITH clause in LOOP:" (WHERE variable initializer stepper))
        (%LOOP GO name
               ;; Preserve ordering of the user's loop variables.
               ((loop-variable ... (variable initializer stepper))
@@ -353,14 +353,14 @@
      (SYNTACTIC-ERROR-IF-NOT-NAME variable
          ("Malformed named-LET-style clause in LOOP:" (variable initializer))
        (%LOOP GO name state
-              ((WITH variable initializer) . loop-clauses)
+              ((WHERE variable initializer) . loop-clauses)
               body)))
 
     ((%LOOP GO name state ((variable initializer stepper) . loop-clauses) body)
      (SYNTACTIC-ERROR-IF-NOT-NAME variable
          ("Malformed DO-style clause in LOOP:" (variable initializer stepper))
        (%LOOP GO name state
-              ((WITH variable initializer stepper) . loop-clauses)
+              ((WHERE variable initializer stepper) . loop-clauses)
               body)))
 
     ((%LOOP GO name state (clause . loop-clauses) body)
