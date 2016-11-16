@@ -1,24 +1,27 @@
 (module (arguile type)
   #:export (type coerce ->))
-(use (arguile ssyntax)
-     (arguile core)
-     (arguile data str)
-     (arguile guile)
-     (arguile error)
-     (arguile sugar))
+(use (arguile base)
+     (arguile base str)
+     (arguile base num)
+     (arguile base fn)
+     (arguile base lst)
+     (arguile base kwrd)
+     (arguile base sym)
+     (arguile base chr)
+     (arguile base syn))
 
 (def type (x)
  (cond
   ((null? x)          'sym)
   ((str? x)           'str)
-  ((number? x)        'num)
-  ((procedure? x)     'fn)
-  ((symbol? x)        'sym)
+  ((num? x)           'num)
+  ((fn? x)            'fn)
+  ((sym? x)           'sym)
   ((syn? x)           'syn)
   ((hash-table? x)    'table)
-  ((char? x)          'chr)
+  ((chr? x)           'chr)
   ((vector? x)        'vec)
-  ((keyword? x)       'kword)
+  ((kwrd? x)          'kwrd)
   ((pair? x)          'pair)
   (else               (error "Type: unknown type" x))))
 
@@ -43,17 +46,16 @@
          (for-each
           (fn (x) (hash-ref conversions (car x) (cadr x)))
           (cdr e))))
-     `(
-       (dat (syn ,syntax->datum))
-       (str (int ,number->string)
-            (num ,number->string)
+     `((dat (syn ,syn->dat))
+       (str (int ,num->str)
+            (num ,num->str)
             (chr ,str)
-            (sym ,(fn (x) (if (eqv? x 'nil) "" (symbol->string x)))))
+            (sym ,(fn (x) (if (eqv? x 'nil) "" (sym->str x)))))
        
        (sym (str ,str->sym)
             (chr ,(fn (c) (str->sym (str c)))))
        
-       (int (chr ,(fn (c . args) (char->integer c)))
+       (int (chr ,(fn (c . args) (chr->int c)))
             (num ,(fn (x . args) (iround x)))
             (str ,(fn (x . args)
                     (let n (apply str->num '(x args))
@@ -65,8 +67,8 @@
                         (error "Can't coerce " x 'num))))
             (int ,(fn (x) x)))
        
-       (chr (int ,integer->char)
-            (num ,(fn (x) (integer->char
+       (chr (int ,int->chr)
+            (num ,(fn (x) (int->chr
                            (iround x)))))))
     coercions))
 
