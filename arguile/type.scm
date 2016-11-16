@@ -4,7 +4,8 @@
 
 (def type (x)
  (cond
-  ((null? x)          'sym)
+  ((lst? x)           'lst)
+  ((pair? x)          'pair)
   ((str? x)           'str)
   ((num? x)           'num)
   ((fn? x)            'fn)
@@ -14,7 +15,8 @@
   ((chr? x)           'chr)
   ((vector? x)        'vec)
   ((kwrd? x)          'kwrd)
-  ((pair? x)          'pair)
+  ;; TODO: is null? useful as a type?
+  ((null? x)          'sym)
   (else               (error "Type: unknown type" x))))
 
 (def coerce (x to-type . args)
@@ -25,7 +27,7 @@
                converter (hash-ref conversions x-type fail))
           (apply converter (cons x args))))))
 
-(mac -> ((_ type obj args ...) #'(coerce obj 'type args ...)))
+(mac -> ((_ type obj . args) #'(coerce obj 'type . args)))
 
 (def coercions
     ;;TODO: Allow extension
@@ -38,10 +40,18 @@
          (for-each
           (fn (x) (hash-set! conversions (car x) (cadr x)))
           (cdr e))))
-     `((dat (syn ,syn->dat))
+     `((dat (syn ,syn->dat)
+            (lst ,syn->dat))
+       ;; So clearly this is a bit hacky
+       (syn (lst ,(fn (dat ctx) (dat->syn ctx dat)))
+            (num ,(fn (dat ctx) (dat->syn ctx dat)))
+            (str ,(fn (dat ctx) (dat->syn ctx dat)))
+            (sym ,(fn (dat ctx) (dat->syn ctx dat)))
+            (kwrd ,(fn (dat ctx) (dat->syn ctx dat))))
        (str (int ,num->str)
             (num ,num->str)
             (chr ,str)
+            ;; TODO: use \\
             (sym ,(fn (x) (if (eqv? x 'nil) "" (sym->str x)))))
        
        (sym (str ,str->sym)
