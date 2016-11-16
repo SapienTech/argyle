@@ -1,7 +1,8 @@
 (module (arguile base))
-(export =? 0? 1?)
+(export =? 0? 1? flatn)
 (export-syntax mac fn def defp let with do
-               fn-case & \\ ret =)
+               fn-case & \\ ret =
+               re-export-modules)
 (use (srfi srfi-1)
      (arguile guile))
 
