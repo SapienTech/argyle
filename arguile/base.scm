@@ -2,7 +2,8 @@
 (export =? 0? 1?)
 (export-syntax mac fn def defp let with do
                fn-case & \\ ret =)
-(use (arguile guile))
+(use (srfi srfi-1)
+     (arguile guile))
 
 (define-syntax mac
   (lambda (ctx)
@@ -71,5 +72,36 @@
 (def =? _=)
 (def 0? zero?)
 (def 1? (n) (=? 1 n))
+(def flatn append-map)
 
-;;; TODO: add macro to reexport submodules
+;;; Consider how we are going to expose above defs for base
+;;; op1: put them in guile.scm
+;;; TODO: export non-used submodules to avoid code duplication
+(mac re-export-modules x
+  ((_ m ...)
+   #`(re-export 
+      #,@(datum->syntax x
+           (append-map
+             (fn (m)
+               (module-map (fn (name data) name)
+                           (resolve-interface (syntax->datum m))))
+             #'(m ...))))))
+
+;;; Eventually, this `use` will be handled by export-modules
+(use (arguile base str)
+     (arguile base num)
+     (arguile base lst)
+     (arguile base sym)
+     (arguile base chr)
+     (arguile base fn)
+     (arguile base kwrd)
+     (arguile base syn))
+
+(re-export-modules (arguile base str)
+                   (arguile base num)
+                   (arguile base lst)
+                   (arguile base sym)
+                   (arguile base chr)
+                   (arguile base fn)
+                   (arguile base kwrd)
+                   (arguile base syn))
