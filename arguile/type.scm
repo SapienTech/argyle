@@ -2,7 +2,7 @@
   #:export (type coerce ->))
 (use (arguile ssyntax)
      (arguile core)
-     (arguile data table)
+     (arguile data str)
      (arguile guile)
      (arguile error)
      (arguile sugar))
@@ -10,7 +10,7 @@
 (def type (x)
  (cond
   ((null? x)          'sym)
-  ((string? x)        'str)
+  ((str? x)           'str)
   ((number? x)        'num)
   ((procedure? x)     'fn)
   ((symbol? x)        'sym)
@@ -26,42 +26,42 @@
   (let x-type (type x)
     (if (eqv? to-type x-type) x
         (with (fail (fn () (error "Can't coerce " x to-type))
-               conversions (hash-ref (coercions) to-type fail)
-               converter (hash-ref (conversions) x-type fail))
+               conversions (hash-ref coercions to-type fail)
+               converter (hash-ref conversions x-type fail))
           (apply converter (cons x args))))))
 
 (mac -> ((_ type obj args ...) #'(coerce obj 'type args ...)))
 
 (def coercions
     ;;TODO: Allow extension
-  (ret coercions (make-table)
+  (ret coercions (make-hash-table)
     (for-each
      (fn (e)
        (with (target-type (car e)
-              conversions (make-table))
-         (coercions target-type conversions)
+              conversions (make-hash-table))
+         (hash-ref coercions target-type conversions)
          (for-each
-          (fn (x) (conversions (car x) (cadr x)))
+          (fn (x) (hash-ref conversions (car x) (cadr x)))
           (cdr e))))
      `(
-       (dat (syn ,syn->dat))
+       (dat (syn ,syntax->datum))
        (str (int ,number->string)
             (num ,number->string)
-            (chr ,string)
+            (chr ,str)
             (sym ,(fn (x) (if (eqv? x 'nil) "" (symbol->string x)))))
        
-       (sym (str ,string->symbol)
-            (chr ,(fn (c) (string->symbol (string c)))))
+       (sym (str ,str->sym)
+            (chr ,(fn (c) (str->sym (str c)))))
        
        (int (chr ,(fn (c . args) (char->integer c)))
             (num ,(fn (x . args) (iround x)))
             (str ,(fn (x . args)
-                    (let n (apply string->number '(x args))
+                    (let n (apply str->num '(x args))
                       (if n (iround n)
                           (error "Can't coerce " x 'int))))))
        
        (num (str ,(fn (x . args)
-                    (or (apply string->number '(x args))
+                    (or (apply str->num '(x args))
                         (error "Can't coerce " x 'num))))
             (int ,(fn (x) x)))
        

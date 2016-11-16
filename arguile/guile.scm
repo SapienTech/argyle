@@ -1,6 +1,8 @@
 (module (arguile guile))
-(export _+ _* _= _apply)
+(export _+ _* _= _apply group expand-kwargs has-kwargs?)
 (export-syntax _let cut)
+(use (srfi srfi-1)
+     (arguile loop))
 
 (define _apply apply)
 (define _+ +)
@@ -34,3 +36,23 @@
                         (apply #,@(reverse (cons #'var args)))))
                    (else
                     (loop rest params (cons s args))))))))))))
+
+(define (group lst n)
+  (loop lp ((lst lst) (acc '()))
+    (if (> n (length lst))
+        (reverse (append lst acc))
+        (lp (drop lst 2) (cons (take lst 2) acc)))))
+
+(define (expand-kwargs args ctx)
+  (loop ((for arg (in-list args))
+         (where args* '()
+                (cons (let ((arg* (syntax->datum arg)))
+                        (if (and (keyword? arg*) (eq? #:o arg*))
+                            (datum->syntax ctx #:optional)
+                            arg))
+                      args*)))
+        => (reverse args*)))
+
+(define (has-kwargs? args)
+  (or-map (lambda (arg) (keyword? (syntax->datum arg)))
+          args))

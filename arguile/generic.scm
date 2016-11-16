@@ -1,11 +1,11 @@
 (module (arguile generic)
   #:export (generic extend
             + * len join rev))
-
 (use (oop goops)
      (arguile ssyntax)
      (arguile core)
      (arguile type)
+     (arguile data str)
      (arguile guile)
      (arguile sugar))
 
@@ -22,7 +22,7 @@
 (def + args
   (cond ((null? args) 0)
         ((one-of `(,string? ,char?) (car args))
-         (apply string-append
+         (apply str-join
                 (map (\\ coerce _ 'str) args)))
         ((symbol? (car args))
          (apply symbol-append
@@ -33,7 +33,7 @@
 (def * args
   (cond ((null? args) 0)
         ((one-of `(,string? ,char?) (car args))
-         (apply string-append
+         (apply str-join
                 (map (fn (val)
                          (coerce (car args) 'str))
                      (iota (apply _* (cdr args))))))

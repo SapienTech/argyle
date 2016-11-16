@@ -6,6 +6,7 @@
 (defp str? string?)
 (defp str: string-ref)
 (defp str! string-set!)
+(defp str-len string-length)
 (defp str-join string-append)
 (defp str->lst string->list)
 (defp str->num string->number)

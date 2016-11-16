@@ -1,11 +1,10 @@
 (module (arguile ssyntax)
   #:export (mac syn? syn-case w/syn
             syn->dat dat->syn))
-(use (srfi srfi-1)
-     (arguile core)
-     (arguile loop))
+(use (arguile guile))
 
 ;;; TODO: Figure out how to add defs before matching
+
 (define-syntax mac
   (lambda (ctx)
     (syntax-case ctx ()
@@ -22,8 +21,8 @@
              (syntax-case x (aux ...)
                ((_ . patt) templ) ...)))))))
 
-(def syn? (obj)
-  (& (vector? obj) (eq? 'syntax-object (vector-ref obj 0))))
+(define (syn? obj)
+  (and (vector? obj) (eq? 'syntax-object (vector-ref obj 0))))
 
 (mac syn-case
   ((_ ctx (aux ...) ((kword . patt) templ) ...)
@@ -35,11 +34,5 @@
    (with-syntax ((items (group #'(item ...) 2)))
      #'(with-syntax items e1 ...))))
 
-(def syn->dat syntax->datum)
-(def dat->syn datum->syntax) 
-
-(def group (lst n)
-  (loop lp ((lst lst) (acc '()))
-    (if (> n (length lst))
-        (reverse (append lst acc))
-        (lp (drop lst 2) (cons (take lst 2) acc)))))
+(define syn->dat syntax->datum)
+(define dat->syn datum->syntax)

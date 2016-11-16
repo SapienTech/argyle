@@ -1,11 +1,7 @@
 (module (arguile core)
   #:export (fn def defp let with do fn-case & = =? 0? 1?))
 (use (arguile guile)
-     (arguile ssyntax)
-     (arguile loop)
-     (arguile type)
-     (arguile io)
-     (arguile generic))
+     (arguile ssyntax))
 
 (mac fn
   ((_ args e1 e2 ...)
@@ -53,18 +49,3 @@
 (def =? _=)
 (def 0? zero?)
 (def 1? (n) (=? 1 n))
-
-(def expand-kwargs (args ctx)
-  (loop ((for arg (in-list args))
-         (where args* '()
-           (cons (let arg* (-> dat arg)
-                   (if (& (keyword? arg*) (eq? #:o arg*))
-                       (dat->syn ctx #:optional)
-                       arg))
-                 args*)))
-        => (rev args*)
-        ))
-
-(def has-kwargs? (args)
-  (or-map (fn (arg) (keyword? (syntax->datum arg)))
-          args))

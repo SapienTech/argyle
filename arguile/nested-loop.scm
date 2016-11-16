@@ -65,4 +65,4 @@
 
   (define-aux parallel nested)
 
-  (include-file/downcase ((arguile lib loop private) nested-loop)))
+  (include-file/downcase ((arguile loop) nested-loop)))
