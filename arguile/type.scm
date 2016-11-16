@@ -1,14 +1,6 @@
 (module (arguile type)
   #:export (type coerce ->))
-(use (arguile base)
-     (arguile base str)
-     (arguile base num)
-     (arguile base fn)
-     (arguile base lst)
-     (arguile base kwrd)
-     (arguile base sym)
-     (arguile base chr)
-     (arguile base syn))
+(use (arguile base))
 
 (def type (x)
  (cond

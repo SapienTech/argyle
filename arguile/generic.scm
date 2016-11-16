@@ -4,10 +4,7 @@
 (use (oop goops)
      (arguile base)
      (arguile guile)
-     (arguile type)
-     (arguile base str)
-     (arguile base sym)
-     (arguile base chr)) 
+     (arguile type)) 
 
 (mac generic
   ((_ name) #'(define-generic name)))
