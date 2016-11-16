@@ -1,7 +1,8 @@
-(module (arguile data str))
-(use (arguile core))
+(module (arguile base str))
+(use (arguile base))
 
 ;;; Standardize a macro for ref, set, copy, etc
+
 (defp str string)
 (defp str? string?)
 (defp str: string-ref)

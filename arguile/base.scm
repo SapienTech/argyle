@@ -1,7 +1,24 @@
-(module (arguile core)
-  #:export (fn def defp let with do fn-case & = =? 0? 1?))
-(use (arguile guile)
-     (arguile ssyntax))
+(module (arguile base))
+(export =? 0? 1?)
+(export-syntax mac fn def defp let with do
+               fn-case & \\ ret =)
+(use (arguile guile))
+
+(define-syntax mac
+  (lambda (ctx)
+    (syntax-case ctx ()
+      ((mac name ((_ . patt) templ) ...)
+       #'(mac name x () ((_ . patt) templ) ...))
+      ((mac name x ((_ . patt) templ) ...)
+       (identifier? #'x)
+       #'(mac name x () ((_ . patt) templ) ...))
+      ((mac name (aux ...) ((_ . patt) templ) ...)
+       #'(mac name x (aux ...) ((_ . patt) templ) ...))
+      ((mac name x (aux ...) ((_ . patt) templ) ...)
+       #'(define-syntax name
+           (lambda (x)
+             (syntax-case x (aux ...)
+               ((_ . patt) templ) ...)))))))
 
 (mac fn
   ((_ args e1 e2 ...)
@@ -32,6 +49,7 @@
    #'(_let ((var val)) (with (rest ...) e1 e2 ...))))
 
 (mac do ((_ e1 ...) #'(begin e1 ...)))
+
 ;;; TODO: check if var is a free variable, and if so, define it
 (mac =
   ((_ var val) #'(set! var val))
@@ -45,7 +63,13 @@
 (mac &
   ((_ e1 ...) #'(and e1 ...)))
 
+(mac \\ ((\\ fn args ...) #'(cut fn args ...)))
+
+(mac ret ((ret var e1 e2 ...) #'(let var e1 e2 ... var)))
+
 ;;; Make generic
 (def =? _=)
 (def 0? zero?)
 (def 1? (n) (=? 1 n))
+
+;;; TODO: add macro to reexport submodules
