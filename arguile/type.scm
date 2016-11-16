@@ -34,9 +34,9 @@
      (fn (e)
        (with (target-type (car e)
               conversions (make-hash-table))
-         (hash-ref coercions target-type conversions)
+         (hash-set! coercions target-type conversions)
          (for-each
-          (fn (x) (hash-ref conversions (car x) (cadr x)))
+          (fn (x) (hash-set! conversions (car x) (cadr x)))
           (cdr e))))
      `((dat (syn ,syn->dat))
        (str (int ,num->str)
