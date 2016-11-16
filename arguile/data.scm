@@ -1,10 +1,8 @@
 (module (arguile data)
   #:export (data data-type? data?))
 
-(use (arguile core)
-     (arguile ssyntax)
+(use (arguile base)
      (arguile generic)
-     (arguile sugar)
      (arguile data records))
 
 (mac data x

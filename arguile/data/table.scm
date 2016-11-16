@@ -1,7 +1,6 @@
 (module (arguile data table)
   #:export (make-table table-fn table-fn! table? table: table!))
-(use (arguile ssyntax)
-     (arguile core)
+(use (arguile base)
      (arguile data))
 
 ;;; TODO: allow init size and comparison operators

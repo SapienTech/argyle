@@ -1,8 +1,7 @@
 (module (arguile data vec)
   #:export (make-vec vec-fn vec-fn!
             vec? vec: vec! vec-len))
-(use (arguile ssyntax)
-     (arguile core)
+(use (arguile base)
      (arguile data))
 
 ;;; TODO: add optional fill
