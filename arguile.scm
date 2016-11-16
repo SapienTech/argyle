@@ -1,5 +1,5 @@
 (module (arguile)
-  :re-export
+  #:re-export
   (mac syn-case syn? syn-case w/syn syn->dat dat->syn
    fn def let with do fn-case & = =? 0? 1?
    loop                         ; How to re-export whole module?
