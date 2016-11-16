@@ -1,5 +1,5 @@
 (module (arguile base))
-(export =? 0? 1? flatn)
+(export =? 0? 1? flatn ~ nil?)
 (export-syntax mac fn def defp let with do
                fn-case & \\ ret =
                re-export-modules)
@@ -42,6 +42,7 @@
   ((_ var val e1 e2 ...)
    #'(with (var val) e1 e2 ...)))
 
+;;; TODO change to w/
 (mac with
   ((_ () e1 e2 ...)
    #'(_let () e1 e2 ...))
@@ -73,6 +74,8 @@
 (def =? _=)
 (def 0? zero?)
 (def 1? (n) (=? 1 n))
+(def ~ not)
+(def nil? null?)
 (def flatn append-map)
 
 ;;; Consider how we are going to expose above defs for base
