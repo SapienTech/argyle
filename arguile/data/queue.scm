@@ -1,22 +1,22 @@
 (module (arguile data queue)
-  #:export (make-q q? q-null?
+  #:export (make-q q? q-nil?
             q-fn q-fn!
-            q-head q-tail q-len
+            q-hd q-tl q-len
             enq! deq!
-            queue-empty-condition?
-            lst->q q->lst))
+            q->lst lst->q
+            q->vec vec->q
+            queue-empty-condition?))
 
-(use (arguile ssyntax)
-     (arguile core)
-     (arguile generic)
+(use (arguile base)
      (arguile data)
+     (arguile data vec)
+     (arguile generic)
      (rnrs conditions))
 
-(data queue (len head tail)
+(data queue (len hd tl)
   ((len q-len q-len!)
-   (head q-head q-head!)
-   (tail q-tail q-tail!))
-  
+   (hd q-hd q-hd!)
+   (tl q-tl q-tl!))
   (case-lambda
     (() (deq! self))
     ((k) (enq! self k))))
@@ -24,37 +24,41 @@
 (def make-q ()
   (make-queue 0 '() '()))
 
-(def q-null? (q) (zero? (q-len q)))
+(def q-nil? (q) (0? (q-len q)))
 
 (def enq! (q obj)
-  (q-tail! q (cons obj (q-tail q)))
+  (q-tl! q (cons obj (q-tl q)))
   (q-len! q (1+ (q-len q))))
 
 (def deq! (q)
-  (when (q-null? q)
+  (when (q-nil? q)
     (raise (condition
             (make-queue-empty-condition)
             (make-who-condition 'dequeue)
             (make-message-condition "There are no elements to dequeue")
             (make-irritants-condition (list queue)))))
-  (with (h (q-head q)
-         t (q-tail q))
+  (with (h (q-hd q)
+         t (q-tl q))
     (q-len! q (1- (q-len q)))
-    (if (null? h)
+    (if (nil? h)
         (let h* (reverse t)
-          (q-head! q (cdr h*))
-          (q-tail! q '())
+          (q-hd! q (cdr h*))
+          (q-tl! q '())
           (car h*))
         (do
-          (q-head! q (cdr h))
+          (q-hd! q (cdr h))
           (car h)))))
 
-(define (lst->q lst)
-  (_make-queue (len lst) lst '()))
+(def lst->q (lst)
+  (make-queue (len lst) lst '()))
+  
+(def q->lst (q)
+  (join (q-hd q)
+        (rev (q-tl q))))
 
-(define (q->lst q)
-  (+ (q-head q)
-     (reverse (q-tail q))))
+;;; Could be more efficient
+(def vec->q (compose lst->q vec->lst))
+(def q->vec (compose lst->vec q->lst))
 
 ;;; TODO: make less verbose
 (define-condition-type &queue-empty
