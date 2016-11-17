@@ -6,6 +6,8 @@
      (arguile guile)
      (arguile type)) 
 
+;;; Major update: Can't use goops directly, since that requires all types
+;;; are classes, instead of any arbitrary types... really frustrating
 (mac generic
   ((_ name) #'(define-generic name)))
 
@@ -28,24 +30,22 @@
   (cond ((null? args) 0)
         ((one-of `(,str? ,chr?) (car args))
          (apply str-join
-                (map (\\ coerce _ 'str) args)))
+                (map (\\ -> str _) args)))
         ((sym? (car args))
          (apply sym-join
-                (map (\\ coerce _ 'sym) args)))
+                (map (\\ -> sym _) args)))
         (else (apply _+ args))))
 
-;;; Add cartesian product for data
+;;; TODO: Add cartesian product for data
 (def * args
   (cond ((null? args) 0)
         ((one-of `(,str? ,chr?) (car args))
          (apply str-join
-                (map (fn (val)
-                         (coerce (car args) 'str))
+                (map (fn (val) (-> str (car args)))
                      (iota (apply _* (cdr args))))))
         ((sym? (car args))
          (apply sym-join
-                (map (fn (val)
-                         (coerce (car args) 'sym))
+                (map (fn (val) (-> sym (car args)))
                      (iota (apply _* (cdr args))))))
         (else (apply _* args))))
 
