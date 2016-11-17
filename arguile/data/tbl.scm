@@ -1,5 +1,5 @@
 (module (arguile data tbl)
-  #:export (make-tbl tbl-fn tbl-fn! tbl?))
+  #:export (tbl make-tbl tbl-fn tbl-fn! tbl?))
 (use (arguile base)
      (arguile data))
 

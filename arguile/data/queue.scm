@@ -1,5 +1,5 @@
 (module (arguile data queue)
-  #:export (make-q q? q-nil?
+  #:export (queue make-q q? q-nil?
             q-fn q-fn!
             q-hd q-tl q-len
             enq! deq!

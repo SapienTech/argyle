@@ -1,5 +1,5 @@
 (module (arguile data vec)
-  #:export (make-vec vec-fn vec-fn!
+  #:export (vec make-vec vec-fn vec-fn!
             vec? vec-len))
 (use (arguile base)
      (arguile data)
