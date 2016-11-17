@@ -9,18 +9,18 @@
 (define-syntax mac
   (lambda (ctx)
     (syntax-case ctx ()
-      ((mac name ((_ . patt) templ) ...)
-       #'(mac name x () ((_ . patt) templ) ...))
-      ((mac name x ((_ . patt) templ) ...)
+      ((mac name ((_ . patt) guard ... templ) ...)
+       #'(mac name x () ((_ . patt) guard ... templ) ...))
+      ((mac name x ((_ . patt) guard ... templ) ...)
        (identifier? #'x)
-       #'(mac name x () ((_ . patt) templ) ...))
-      ((mac name (aux ...) ((_ . patt) templ) ...)
-       #'(mac name x (aux ...) ((_ . patt) templ) ...))
-      ((mac name x (aux ...) ((_ . patt) templ) ...)
+       #'(mac name x () ((_ . patt) guard ... templ) ...))
+      ((mac name (aux ...) ((_ . patt) guard ... templ) ...)
+       #'(mac name x (aux ...) ((_ . patt) guard ... templ) ...))
+      ((mac name x (aux ...) ((_ . patt) guard ... templ) ...)
        #'(define-syntax name
            (lambda (x)
              (syntax-case x (aux ...)
-               ((_ . patt) templ) ...)))))))
+               ((_ . patt) guard ... templ) ...)))))))
 
 (mac fn
   ((_ args e1 e2 ...)
@@ -34,6 +34,8 @@
       e1 e2 ...))
   ((_ name val)
    #'(define name val)))
+
+(def defed? defined?)
 
 (mac defp
   ((_ name . rest) #'(do (def name . rest) (export name))))
@@ -77,6 +79,7 @@
 (def ~ not)
 (def nil? null?)
 (def flatn append-map)
+(def &map and-map)
 
 ;;; Consider how we are going to expose above defs for base
 ;;; op1: put them in guile.scm
