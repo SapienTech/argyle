@@ -1,10 +1,14 @@
 (module (arguile io)
-  #:export (pr prn))
+  #:export (pr prn prnn))
 (use (arguile base))
 
 (mac pr
-  ((pr arg) #'(display arg))
-  ((pr arg arg* ...) #'(do (display arg) (pr arg* ...))))
+  ((_ v1) #'(display v1))
+  ((_ v1 v2 ...) #'(do (display v1) (pr v2 ...))))
 
 (mac prn
-  ((prn arg arg* ...) #'(do (pr arg arg* ...) (newline))))
+  ((_ v1 v2 ...) #'(do (pr v1 v2 ...) (newline))))
+
+(mac prnn
+  ((_ v1) #'(prn v1))
+  ((_ v1 v2 ...) #'(do (prn v1) (prnn v2 ...))))
