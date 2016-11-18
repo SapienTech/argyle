@@ -1,17 +1,18 @@
 (module (arguile data tbl)
-  #:export (tbl make-tbl tbl-fn tbl-fn! tbl?))
+  #:export (tbl tbl? tbl-t tbl-t! tbl-fn tbl-fn!))
 (use (arguile base)
      (arguile data))
 
 ;;; TODO: allow init size and comparison operators
-(data tbl () ()
-  (let t (make-hash-table)
-    (fn-case
-      (() t)
-      ((k) (hash-ref t k))
-      ((k v) (hash-set! t k v)))))
+(data tbl (t)
+      #:init (%make-tbl t)
+      #:app (fn-case
+             (() (tbl-t self))
+             ((k) (hash-ref (tbl-t self) k))
+             ((k v) (hash-set! (tbl-t self) k v))))
 
-;;; TODO: figure out opt-args
+(defp make-tbl (#:o n)
+  (%make-tbl (if n (make-hash-table n) (make-hash-table))))
 (defp tbl: (t k) (t k))
 (defp tbl! (t k obj) (t k obj))
 (defp tbl-del! (t k) (hash-remove! (t) k))
@@ -27,7 +28,7 @@
 
 (defp tbl-cnt (pred t) (hash-count pred (t)))
 (defp tbl-clr! (t) (hash-clear! (t)))
-(defp tbl-fold (fun init t) (hash-fold fun init (t)))
-(defp tbl-each (fun t) (hash-for-each fun (t)))
-(defp tbl-map->lst (fun t) (hash-map->list fun (t)))
+(defp tbl-fold (f init t) (hash-fold fun init (t)))
+(defp tbl-each (f t) (hash-for-each fun (t)))
+(defp tbl-map->lst (f t) (hash-map->list f (t)))
 
