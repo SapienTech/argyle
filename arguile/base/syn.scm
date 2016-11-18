@@ -1,8 +1,11 @@
 (module (arguile base syn)
-  #:export (syn? syn-case w/syn
+  #:export (syn syn? syn-case w/syn
             syn->dat dat->syn))
 (use (arguile base)
      (arguile guile))
+
+(mac syn
+  ((_ obj) #'(syntax obj)))
 
 (def (syn? obj)
   (and (vector? obj) (eq? 'syntax-object (vector-ref obj 0))))

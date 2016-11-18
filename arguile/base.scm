@@ -1,6 +1,6 @@
 (module (arguile base))
-(export =? 0? 1? flatn ~ nil?)
-(export-syntax mac fn def defp let with do
+(export =? 0? 1? flatn ~ nil? &map id? set\)
+(export-syntax mac fn def defp let with w/ do
                fn-case & \\ ret =
                re-export-modules)
 (use (srfi srfi-1)
@@ -44,8 +44,16 @@
   ((_ var val e1 e2 ...)
    #'(with (var val) e1 e2 ...)))
 
-;;; TODO change to w/
+;;; TODO remove after compatability fixes
 (mac with
+  ((_ () e1 e2 ...)
+   #'(_let () e1 e2 ...))
+  ((_ (var val) e1 e2 ...)
+   #'(_let ((var val)) e1 e2 ...))
+  ((_ (var val rest ...) e1 e2 ...)
+   #'(_let ((var val)) (with (rest ...) e1 e2 ...))))
+
+(mac w/
   ((_ () e1 e2 ...)
    #'(_let () e1 e2 ...))
   ((_ (var val) e1 e2 ...)
@@ -80,6 +88,8 @@
 (def nil? null?)
 (def flatn append-map)
 (def &map and-map)
+(def id? identifier?)
+(def set\ lset-difference)
 
 ;;; Consider how we are going to expose above defs for base
 ;;; op1: put them in guile.scm
