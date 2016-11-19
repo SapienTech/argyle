@@ -1,5 +1,5 @@
 (module (arguile base))
-(export =? 0? 1? flatn ~ nil? &map id? set\)
+(export =? 0? 1? flatn ~ nil? &map id? set\ defd?)
 (export-syntax mac fn def defp let with w/ do
                fn-case & \\ ret =
                re-export-modules)
@@ -35,7 +35,7 @@
   ((_ name val)
    #'(define name val)))
 
-(def defed? defined?)
+(def defd? defined?)
 
 (mac defp
   ((_ name . rest) #'(do (def name . rest) (export name))))
