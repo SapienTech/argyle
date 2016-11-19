@@ -1,62 +1,37 @@
 (module (arguile generic)
-  #:export (generic extend
-            + * len join rev))
-(use (oop goops)
-     (arguile base)
-     (arguile guile)
-     (arguile type)) 
+    #:export (generic extend))
+(use (arguile base)
+     (arguile loop)
+     (arguile type)
+     (arguile data)
+     (arguile error)
+     (arguile io)
+     (arguile data tbl))
 
-;;; Major update: Can't use goops directly, since that requires all types
-;;; are classes, instead of any arbitrary types... really frustrating
+(data gen-fn (name tbl)
+      #:init (%gen-fn name tbl)
+      #:app (fn args
+              (apply (resolve-fn (gen-fn-tbl self) args)
+                     args)))
+
 (mac generic
-  ((_ name) #'(define-generic name)))
+  ((_ name) (id? #'name)
+   #'(def name (%gen-fn 'name (make-tbl)))))
 
-;;; TODO: allow multiple declarations
+;;; Will overwrite defs w/ same args
+;;; args must be values, not variables
+;;; fn must be a full proc
 (mac extend
-  ((_ ((setr name) . args) body ...)
-   #'(define-method ((setr name) . args) body ...))
-  ((_ name (args ...) body ...)
-   #'(define-method (name args ...) body ...)))
+  ((_ name (arg1 ...) fn)
+   (defd? (-> dat #'name))
+   #'(loop ((for arg (in-list '(arg1 ...)))
+            (where tbl (gen-fn-tbl name)
+              (with (arg-t (type arg) t (tbl arg-t))
+                (if t t (do (tbl arg-t (make-tbl))
+                          (tbl arg-t))))))
+        => (tbl 'fun fn))))
 
-(generic join)
-(extend join ((e1 <list>) (e2 <list>))
-  (append e1 e2))
-
-(generic rev)
-(extend rev ((orderable <list>))
-  (reverse orderable))
-
-(def + args
-  (cond ((null? args) 0)
-        ((one-of `(,str? ,chr?) (car args))
-         (apply str-join
-                (map (\\ -> str _) args)))
-        ((sym? (car args))
-         (apply sym-join
-                (map (\\ -> sym _) args)))
-        (else (apply _+ args))))
-
-;;; TODO: Add cartesian product for data
-(def * args
-  (cond ((null? args) 0)
-        ((one-of `(,str? ,chr?) (car args))
-         (apply str-join
-                (map (fn (val) (-> str (car args)))
-                     (iota (apply _* (cdr args))))))
-        ((sym? (car args))
-         (apply sym-join
-                (map (fn (val) (-> sym (car args)))
-                     (iota (apply _* (cdr args))))))
-        (else (apply _* args))))
-
-(def len (x)
-  (cond ((str? x) (str-len x))
-        ((hash-table? x) (hash-count (const #t) x))
-        ((vector? x) (vector-length x))
-        (else (length x))))
-
-
-(def one-of (tests val)
-  (if (null? tests) #f
-      (or ((car tests) val)
-          (one-of (cdr tests) val))))
+(def resolve-fn (tbl args)
+  (loop ((for arg (in-list args))
+         (where t tbl (and=> t (\\ _ (type arg)))))
+        => (if t (t 'fun) (err "No generic function for args:" args))))
