@@ -2,9 +2,6 @@
   #:export (data data-type? data?))
 (use (arguile base)
      (arguile data records)
-     (arguile type)
-     (arguile generic)
-     (arguile error)
      (srfi srfi-1))
 
 ;;; TODO: add #:init to field specs
@@ -62,3 +59,10 @@
   (def not-app (name)
     (fn args (err "Wrong type to apply:" name
                   "data-type not applicable"))))
+(use (arguile data tbl)
+     (arguile data vec)
+     (arguile data q))
+
+(re-export-modules (arguile data tbl)
+                   (arguile data vec)
+                   (arguile data q))

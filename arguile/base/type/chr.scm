@@ -1,4 +1,4 @@
-(module (arguile base chr))
+(module (arguile base type chr))
 (use (arguile base))
 
 (defp chr? char?)

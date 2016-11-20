@@ -1,4 +1,4 @@
-(module (arguile base str))
+(module (arguile base type str))
 (use (arguile base))
 
 ;;; Standardize a macro for ref, set, copy, etc

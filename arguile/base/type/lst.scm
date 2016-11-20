@@ -1,4 +1,4 @@
-(module (arguile base lst))
+(module (arguile base type lst))
 (use (arguile base))
 
 (defp lst list)

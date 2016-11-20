@@ -1,11 +1,19 @@
-(module (arguile type)
+(module (arguile base type)
   #:export (type coerce ->))
-(use (arguile base))
+(use (arguile base)
+     (arguile base type lst)
+     (arguile base type str)
+     (arguile base type num)
+     (arguile base type fn)
+     (arguile base type sym)
+     (arguile base type syn)
+     (arguile base type chr)
+     (arguile base type kwrd))
 
 (def type (x)
  (cond
   ((lst? x)           'lst)
-  ((pair? x)          'pair)
+  ;((pair? x)          'pair)
   ((str? x)           'str)
   ((num? x)           'num)
   ((fn? x)            'fn)
@@ -75,3 +83,13 @@
     coercions))
 
 (def iround (compose inexact->exact round))
+
+(re-export-modules 
+ (arguile base type lst)
+ (arguile base type str)
+ (arguile base type num)
+ (arguile base type fn)
+ (arguile base type sym)
+ (arguile base type syn)
+ (arguile base type chr)
+ (arguile base type kwrd))

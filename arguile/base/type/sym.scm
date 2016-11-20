@@ -1,4 +1,4 @@
-(module (arguile base sym))
+(module (arguile base type sym))
 (use (arguile base))
 
 (defp sym symbol)

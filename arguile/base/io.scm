@@ -1,4 +1,4 @@
-(module (arguile io)
+(module (arguile base io)
   #:export (pr prn prnn))
 (use (arguile base))
 

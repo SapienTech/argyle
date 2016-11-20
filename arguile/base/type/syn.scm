@@ -1,6 +1,6 @@
-(module (arguile base syn)
-  #:export (syn syn? syn-case w/syn
-            syn->dat dat->syn))
+(module (arguile base type syn)
+    #:export (syn syn? syn-case let-syn
+              w/syn syn->dat dat->syn))
 (use (arguile base)
      (arguile guile))
 
@@ -14,10 +14,13 @@
   ((_ ctx (aux ...) ((kword . patt) templ) ...)
    #'(syntax-case ctx (aux ...)
        ((kword . patt) templ) ...)))
+(mac let-syn
+  ((_ syn exp body ...)
+   #'(w/syn (syn exp) body ...)))
 
 (mac w/syn
   ((_ (item ...) e1 ...)
-   (with-syntax ((items (group #'(item ...) 2)))
+   (with-syntax ((items (grp #'(item ...) 2)))
      #'(with-syntax items e1 ...))))
 
 (def syn->dat syntax->datum)

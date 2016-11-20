@@ -1,4 +1,4 @@
-(module (arguile base num))
+(module (arguile base type num))
 (use (arguile base))
 
 (defp num? number?)

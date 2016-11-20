@@ -1,14 +1,11 @@
-(module (arguile data queue)
+(module (arguile data q)
   #:export (q make-q q? q-nil?
             enq! deq!
             q-hd q-len q-fn q-fn!
             q->lst lst->q q->vec vec->q))
-
 (use (arguile base)
      (arguile data)
-     (arguile data vec)
-     (arguile generic)
-     (arguile error))
+     (arguile data vec))
 
 (data q (len hd tl)
       #:init (%make-q len hd tl)

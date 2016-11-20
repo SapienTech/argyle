@@ -1,4 +1,4 @@
-(module (arguile base fn))
+(module (arguile base type fn))
 (use (arguile base))
 (defp fun procedure)
 (defp fn-doc procedure-documentation)

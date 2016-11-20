@@ -53,6 +53,7 @@
   ((_ (var val rest ...) e1 e2 ...)
    #'(_let ((var val)) (with (rest ...) e1 e2 ...))))
 
+;;; If var position is a list, then use receive
 (mac w/
   ((_ () e1 e2 ...)
    #'(_let () e1 e2 ...))
@@ -105,20 +106,12 @@
              #'(m ...))))))
 
 ;;; Eventually, this `use` will be handled by export-modules
-(use (arguile base str)
-     (arguile base num)
-     (arguile base lst)
-     (arguile base sym)
-     (arguile base chr)
-     (arguile base fn)
-     (arguile base kwrd)
-     (arguile base syn))
+(use (arguile base type)
+     (arguile base generic)
+     (arguile base err)
+     (arguile base io))
 
-(re-export-modules (arguile base str)
-                   (arguile base num)
-                   (arguile base lst)
-                   (arguile base sym)
-                   (arguile base chr)
-                   (arguile base fn)
-                   (arguile base kwrd)
-                   (arguile base syn))
+(re-export-modules (arguile base type)
+                   (arguile base generic)
+                   (arguile base err)
+                   (arguile base io))

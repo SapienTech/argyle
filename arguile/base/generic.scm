@@ -2,7 +2,7 @@
   #:export (+ * len))
 (use (arguile base)
      (arguile guile)
-     (arguile type)) 
+     (arguile base type)) 
 
 (def + args
   (cond ((null? args) 0)

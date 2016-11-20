@@ -1,4 +1,4 @@
-(module (arguile base kwrd))
+(module (arguile base type kwrd))
 (use (arguile base))
 
 (defp kwrd? keyword?)
