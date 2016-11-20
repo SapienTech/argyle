@@ -1,5 +1,5 @@
 (module (arguile guile))
-(export _+ _* _= _apply group expand-kwargs has-kwargs?)
+(export _+ _* _= _apply grp expand-kwargs has-kwargs?)
 (export-syntax _let cut)
 (use (srfi srfi-1)
      (arguile loop))
@@ -37,7 +37,7 @@
                    (else
                     (loop rest params (cons s args))))))))))))
 
-(define (group lst n)
+(define (grp lst n)
   (loop lp ((lst lst) (acc '()))
     (if (> n (length lst))
         (reverse (append lst acc))
