@@ -17,6 +17,7 @@
                  (make-vector len (car fill)))))
 (defp vec: (v k) (v k))
 (defp vec! (v k obj) (v k obj))
+(defp vec-len (v) (vector-length (v)))
 (defp vec->lst (v) (vector->list (v)))
 (defp lst->vec (lst) (%make-vec (list->vector lst)))
 (defp vec-cpy (v) (%make-vec (vector-copy (v))))
