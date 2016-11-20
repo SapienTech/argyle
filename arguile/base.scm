@@ -1,7 +1,7 @@
 (module (arguile base))
 (export =? 0? 1? flatn ~ nil? &map id? set\ defd?)
 (export-syntax mac fn def defp let with w/ do
-               fn-case & \\ ret =
+               fn-case & \\ ret aif =
                re-export-modules)
 (use (srfi srfi-1)
      (arguile guile))
@@ -80,6 +80,12 @@
 (mac \\ ((\\ fn args ...) #'(cut fn args ...)))
 
 (mac ret ((ret var e1 e2 ...) #'(let var e1 e2 ... var)))
+
+(mac aif x
+  ((_ test then else)
+   (let-syn it (-> syn 'it x)
+     #'(let it test
+         (if it then else)))))
 
 ;;; Make generic
 (def =? _=)
