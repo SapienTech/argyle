@@ -14,6 +14,7 @@
   ((_ ctx (aux ...) ((kword . patt) templ) ...)
    #'(syntax-case ctx (aux ...)
        ((kword . patt) templ) ...)))
+
 (mac let-syn
   ((_ syn exp body ...)
    #'(w/syn (syn exp) body ...)))
