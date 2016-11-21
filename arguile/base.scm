@@ -4,15 +4,15 @@
                fn-case & \\ ret aif =
                re-export-modules)
 (use (srfi srfi-1)
-     (arguile guile))
+     (arguile guile)
+     (ice-9 receive))
 
 (define-syntax mac
   (lambda (ctx)
     (syntax-case ctx ()
       ((mac name ((_ . patt) guard ... templ) ...)
        #'(mac name x () ((_ . patt) guard ... templ) ...))
-      ((mac name x ((_ . patt) guard ... templ) ...)
-       (identifier? #'x)
+      ((mac name x ((_ . patt) guard ... templ) ...) (id? #'x)
        #'(mac name x () ((_ . patt) guard ... templ) ...))
       ((mac name (aux ...) ((_ . patt) guard ... templ) ...)
        #'(mac name x (aux ...) ((_ . patt) guard ... templ) ...))
@@ -44,14 +44,17 @@
   ((_ var val e1 e2 ...)
    #'(w/ (var val) e1 e2 ...)))
 
-;;; If var position is a list, then use receive
 (mac w/
   ((_ () e1 e2 ...)
    #'(_let () e1 e2 ...))
   ((_ (var val) e1 e2 ...)
-   #'(_let ((var val)) e1 e2 ...))
+   (if (id? #'var)
+       #'(_let ((var val)) e1 e2 ...)
+       #'(receive var val e1 e2 ...)))
   ((_ (var val rest ...) e1 e2 ...)
-   #'(_let ((var val)) (w/ (rest ...) e1 e2 ...))))
+   (if (id? #'var)
+       #'(_let ((var val)) (w/ (rest ...) e1 e2 ...))
+       #'(receive var val  (w/ (rest ...) e1 e2 ...)))))
 
 (mac do ((_ e1 ...) #'(begin e1 ...)))
 
@@ -79,15 +82,16 @@
          (if it then else)))))
 
 ;;; Make generic
-(def =? _=)
-(def 0? zero?)
-(def 1? (n) (=? 1 n))
-(def ~ not)
-(def nil? null?)
-(def flatn append-map)
-(def &map and-map)
-(def id? identifier?)
-(def set\ lset-difference)
+(eval-when (expand load eval)
+  (def =? _=)
+  (def 0? zero?)
+  (def 1? (n) (=? 1 n))
+  (def ~ not)
+  (def nil? null?)
+  (def flatn append-map)
+  (def &map and-map)
+  (def id? identifier?)
+  (def set\ lset-difference))
 
 ;;; Consider how we are going to expose above defs for base
 ;;; op1: put them in guile.scm
