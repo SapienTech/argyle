@@ -30,9 +30,9 @@
 (def coerce (x to-type . args)
   (let x-type (base-type x)
     (if (eqv? to-type x-type) x
-        (with (fail (fn () (error "Can't coerce " x to-type))
-               conversions (hash-ref coercions to-type fail)
-               converter (hash-ref conversions x-type fail))
+        (w/ (fail (fn () (error "Can't coerce " x to-type))
+             conversions (hash-ref coercions to-type fail)
+             converter (hash-ref conversions x-type fail))
           (apply converter (cons x args))))))
 
 (mac -> ((_ type obj . args) #'(coerce obj 'type . args)))
@@ -41,8 +41,8 @@
   (ret coercions (make-hash-table)
     (for-each
      (fn (e)
-       (with (target-type (car e)
-              conversions (make-hash-table))
+       (w/ (target-type (car e)
+            conversions (make-hash-table))
          (hash-set! coercions target-type conversions)
          (for-each
           (fn (x) (hash-set! conversions (car x) (cadr x)))

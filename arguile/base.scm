@@ -1,6 +1,6 @@
 (module (arguile base))
 (export =? 0? 1? flatn ~ nil? &map id? set\ defd?)
-(export-syntax mac fn def defp let with w/ do
+(export-syntax mac fn def defp let w/ do
                fn-case & \\ ret aif =
                re-export-modules)
 (use (srfi srfi-1)
@@ -42,16 +42,7 @@
 
 (mac let
   ((_ var val e1 e2 ...)
-   #'(with (var val) e1 e2 ...)))
-
-;;; TODO remove after compatability fixes
-(mac with
-  ((_ () e1 e2 ...)
-   #'(_let () e1 e2 ...))
-  ((_ (var val) e1 e2 ...)
-   #'(_let ((var val)) e1 e2 ...))
-  ((_ (var val rest ...) e1 e2 ...)
-   #'(_let ((var val)) (with (rest ...) e1 e2 ...))))
+   #'(w/ (var val) e1 e2 ...)))
 
 ;;; If var position is a list, then use receive
 (mac w/
@@ -60,7 +51,7 @@
   ((_ (var val) e1 e2 ...)
    #'(_let ((var val)) e1 e2 ...))
   ((_ (var val rest ...) e1 e2 ...)
-   #'(_let ((var val)) (with (rest ...) e1 e2 ...))))
+   #'(_let ((var val)) (w/ (rest ...) e1 e2 ...))))
 
 (mac do ((_ e1 ...) #'(begin e1 ...)))
 
