@@ -1,5 +1,5 @@
 (module (arguile base type)
-  #:export (type coerce ->))
+  #:export (base-type coerce ->))
 (use (arguile base)
      (arguile base type lst)
      (arguile base type str)
@@ -10,7 +10,7 @@
      (arguile base type chr)
      (arguile base type kwrd))
 
-(def type (x)
+(def base-type (x)
  (cond
   ((lst? x)           'lst)
   ;((pair? x)          'pair)
@@ -28,7 +28,7 @@
   (else               (error "Type: unknown type" x))))
 
 (def coerce (x to-type . args)
-  (let x-type (type x)
+  (let x-type (base-type x)
     (if (eqv? to-type x-type) x
         (with (fail (fn () (error "Can't coerce " x to-type))
                conversions (hash-ref coercions to-type fail)
@@ -38,7 +38,6 @@
 (mac -> ((_ type obj . args) #'(coerce obj 'type . args)))
 
 (def coercions
-    ;;TODO: Allow extension
   (ret coercions (make-hash-table)
     (for-each
      (fn (e)

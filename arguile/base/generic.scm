@@ -26,7 +26,8 @@
         (else (apply _* args))))
 
 (def len (x)
-  (cond ((str? x) (str-len x))
+  (cond ((lst? (length x)))
+        ((str? x) (str-len x))
         ((hash-table? x) (hash-count (const #t) x))
         ((vector? x) (vector-length x))
         (else (length x))))
