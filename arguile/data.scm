@@ -1,5 +1,5 @@
 (module (arguile data)
-  #:export (data data-type? data?))
+  #:export (data data? data-type? data-type))
 (use (arguile base)
      (arguile data records)
      (srfi srfi-1))
@@ -23,6 +23,8 @@
 
 (def data-type? record-type?)
 (def data? record?)
+(def data-type (obj)
+  (struct-ref (struct-vtable obj) vtable-offset-user))
 
 (eval-when (expand load eval)
 
@@ -59,6 +61,7 @@
   (def not-app (name)
     (fn args (err "Wrong type to apply:" name
                   "data-type not applicable"))))
+
 (use (arguile data tbl)
      (arguile data vec)
      (arguile data q))

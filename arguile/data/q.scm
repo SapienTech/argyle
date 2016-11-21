@@ -1,7 +1,7 @@
 (module (arguile data q)
-  #:export (q make-q q? q-nil?
+  #:export (q make-q %make-q q? q-nil?
             enq! deq!
-            q-hd q-len q-fn q-fn!
+            q-hd q-hd! q-tl q-tl! q-len q-len! q-fn q-fn!
             q->lst lst->q q->vec vec->q))
 (use (arguile base)
      (arguile data)
@@ -31,11 +31,11 @@
        (q-hd! q (cdr (q-hd q)))))
 
 (def move-tl->hd! (q)
-  (q-hd! q (rev (q-tl q)))
+  (q-hd! q (reverse (q-tl q)))
   (q-tl! q '()))
 
 (defp q->lst (q)
-  (join (q-hd q) (rev (q-tl q))))
+  (append (q-hd q) (reverse (q-tl q))))
 
 (defp lst->q (lst)
   (%make-q (len lst) lst '()))
