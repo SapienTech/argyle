@@ -1,7 +1,8 @@
 (module (arguile data vec)
   #:export (vec vec? vec-fn vec-fn!))
 (use (arguile base)
-     (arguile data))
+     (arguile data)
+     (srfi srfi-43))
 
 ;;; TODO: add optional fill
 (data vec (v)
@@ -24,3 +25,5 @@
 (defp vec-fill! (v fill) (vector-fill! (v) fill))
 (defp vec<-! (v1 s1 e1 v2 s2) (vector-move-left! (v1) s1 e1 (v2) s2))
 (defp vec->! (v1 s1 e1 v2 s2) (vector-move-right! (v1) s1 e1 (v2) s2))
+(defp vec-map (fun v . vs) (apply vector-map fun (v) (map (fn (v) (v)) vs)))
+;;; Etc...
