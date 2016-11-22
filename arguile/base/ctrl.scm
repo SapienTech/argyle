@@ -5,4 +5,4 @@
 
 (defp c/prmt call-with-prompt)
 (defp c/vals call-with-values)
-(defp $ %)
+
