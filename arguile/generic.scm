@@ -1,6 +1,6 @@
 (module (arguile generic)
     #:export (gen gen-fn? xtnd type
-              len rev join cpy clr!))
+              len rev join cpy clr! map))
 (use (arguile base)
      (arguile data)
      (arguile guile)
@@ -11,7 +11,7 @@
   ((_ name) (id? #'name)
    #`(def name (%gen-fn 'name (ret t (make-tbl)
                                 #,(when (defd? (-> dat #'name))
-                                  #'(t 'fn name)))))))
+                                  #'(t 'def name)))))))
 
 (data gen-fn (name tbl)
       #:init (%gen-fn name tbl)
@@ -19,36 +19,53 @@
               (apply (resolve-fn (gen-fn-tbl self) args)
                      args)))
 
+;;; This version works, but needs cleanup
 (def resolve-fn (tbl args)
-  (loop ((for arg (in-list args))
-         (where t tbl (and=> t (\\ _ (type arg)))))
-    => (if (& t (t 'fn)) (t 'fn)
-           (aif (tbl 'fn) it
-                (err "No generic fn for args:" args)))))
+  (loop lp ((for arg (in-list args))
+            (where t tbl (and=> t (\\ _ (type arg)))))
+        => (cond ((t 'fun) (t 'fun))
+                 ((tbl 'def) (tbl 'def))
+                 (else (err "No generic fn for args1:" args))) 
+    ;; This handles rest case
+    (if t
+        (if (t 'rst) (t 'rst)
+            (lp))
+        (if (tbl 'def) (tbl 'def)
+            (err "No generic fn for args:" args)))))
 
-(def type (x)
-  (if (data? x) (data-type x)
-      (base-type x)))
-
-(mac xtnd
+;;; Going to straight cpy for this version
+(mac xtnd x
+  ((_ name (arg1 ... . rest) body ...) (~(nil? #'rest))
+   (let-syn (args types) (split #'(arg1 ...))
+     #`(loop ((for type  (in-list 'types))
+              (where tbl (gen-fn-tbl name)
+                (if (tbl type) (tbl type)
+                     (tbl type (make-tbl)))))
+        => (tbl 'rst (fn (#,@#'args . rest) body ...)))))
   ((_ name (arg1 ...) body ...) (defd? (-> dat #'name))
    (let-syn (args types) (split #'(arg1 ...))
-     #'(loop ((for type  (in-list 'types))
+     #`(loop ((for type  (in-list 'types))
               (where tbl (gen-fn-tbl name)
-                (aif (tbl type) it
+                (if (tbl type) (tbl type)
                      (tbl type (make-tbl)))))
-         => (tbl 'fn (fn args body ...))))))
+        => (tbl 'fun (fn args body ...))))))
 
 (eval-when (expand load eval)
   (def split (lst)
-    (call-with-values (fn () (unzip2 (grp lst 2)))
-      list)))
+    (c/vals (fn () (unzip2 (grp lst 2))) list))
+
+  (def type (x)
+    (if (data? x) (data-type x)
+        (base-type x))))
+
+
 
 (gen len)
 (gen rev)
 (gen join)
 (gen cpy)
 (gen clr!)
+(gen map)
 
 (xtnd len (t tbl) (tbl-cnt (const #t) t))
 (xtnd len (v vec) (vec-len v))
@@ -57,8 +74,8 @@
 (xtnd rev (l lst) (reverse l))
 (xtnd rev (v vec) (ret v* (make-vec (vec-len v))
                    (vec<-! v 0 (vec-len v) v* 0)))
-(xtnd join (l1 lst l2 lst) (append l1 l2))
-(xtnd join (s1 str s2 str) (str-join s1 s2))
+(xtnd join (l1 lst . rest) (apply append l1 rest))
+(xtnd join (s1 str . rest) (apply str-join s1 rest))
 (xtnd join (v1 vec v2 vec) (w/ (l1 (vec-len v1) l2 (vec-len v2))
                              (ret v (make-vec (+ l1 l2))
                                (vec->! v1 0 l1 v 0)
@@ -69,3 +86,8 @@
 
 (xtnd clr! (t tbl) (tbl-clr! t))
 (xtnd clr! (q q) (q-hd! q '()) (q-tl! q '()) (q-len! q 0))
+
+(xtnd map (fn fn l lst . rest) (apply map fn lst rest))
+(xtnd map (fn fn v vec . rest) (apply vec-map fn v rest))
+(xtnd map (fn fn s str . rest) (apply str-map fn s rest))
+(xtnd map (fn fn t tbl)        (tbl-map->lst fn t))
