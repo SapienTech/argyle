@@ -2,7 +2,7 @@
   #:export (data data? data-type? data-type))
 (use (arguile base)
      (arguile data records)
-     (srfi srfi-1))
+     ((srfi srfi-1) #:select (first)))
 
 ;;; TODO: add #:init to field specs
 ;;;       order fields in printer

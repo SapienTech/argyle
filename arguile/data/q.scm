@@ -38,7 +38,7 @@
   (append (q-hd q) (reverse (q-tl q))))
 
 (defp lst->q (lst)
-  (%make-q (len lst) lst '()))
+  (%make-q (length lst) lst '()))
 
 (defp q->vec (compose lst->vec q->lst))
 (defp vec->q (compose lst->q vec->lst))

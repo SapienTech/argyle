@@ -5,7 +5,7 @@
      (arguile data)
      (arguile guile)
      (arguile loop)
-     (srfi srfi-1))
+     ((srfi srfi-1) #:select (unzip2 map)))
 
 (mac gen
   ((_ name) (id? #'name)
@@ -23,15 +23,19 @@
 (def resolve-fn (tbl args)
   (loop lp ((for arg (in-list args))
             (where t tbl (and=> t (\\ _ (type arg)))))
-        => (cond ((t 'fun) (t 'fun))
-                 ((tbl 'def) (tbl 'def))
-                 (else (err "No generic fn for args1:" args))) 
+        => (if (& t (t 'fun)) (t 'fun)
+               (if (tbl 'def) (tbl 'def)
+                   (err "No generic fn for args1:" args)))
     ;; This handles rest case
     (if t
         (if (t 'rst) (t 'rst)
             (lp))
         (if (tbl 'def) (tbl 'def)
             (err "No generic fn for args:" args)))))
+
+(def type (x)
+  (if (data? x) (data-type x)
+      (base-type x)))
 
 ;;; Going to straight cpy for this version
 (mac xtnd x
@@ -53,12 +57,12 @@
 (eval-when (expand load eval)
   (def split (lst)
     (c/vals (fn () (unzip2 (grp lst 2))) list))
-
-  (def type (x)
-    (if (data? x) (data-type x)
-        (base-type x))))
-
-
+  (def len length)
+  (def rev reverse)
+  (def join append)
+  (def cpy lst-cpy)
+  (def clr! (lst) (set-cdr! lst '()))
+  (def map map))
 
 (gen len)
 (gen rev)
@@ -71,23 +75,20 @@
 (xtnd len (v vec) (vec-len v))
 (xtnd len (q q) (q-len q))
 
-(xtnd rev (l lst) (reverse l))
 (xtnd rev (v vec) (ret v* (make-vec (vec-len v))
                    (vec<-! v 0 (vec-len v) v* 0)))
-(xtnd join (l1 lst . rest) (apply append l1 rest))
+
 (xtnd join (s1 str . rest) (apply str-join s1 rest))
 (xtnd join (v1 vec v2 vec) (w/ (l1 (vec-len v1) l2 (vec-len v2))
                              (ret v (make-vec (+ l1 l2))
                                (vec->! v1 0 l1 v 0)
                                (vec->! v2 0 l2 v l1))))
-(xtnd cpy (l lst) (lst-cpy l))
 (xtnd cpy (v vec) (vec-cpy v))
 (xtnd cpy (q q) (%make-q (q-len q) (q-hd q) (q-tl q)))
 
 (xtnd clr! (t tbl) (tbl-clr! t))
 (xtnd clr! (q q) (q-hd! q '()) (q-tl! q '()) (q-len! q 0))
 
-(xtnd map (fn fn l lst . rest) (apply map fn lst rest))
-(xtnd map (fn fn v vec . rest) (apply vec-map fn v rest))
-(xtnd map (fn fn s str . rest) (apply str-map fn s rest))
-(xtnd map (fn fn t tbl)        (tbl-map->lst fn t))
+(xtnd map (f fn v vec . rest) (apply vec-map f v rest))
+(xtnd map (f fn s str . rest) (apply str-map f s rest))
+(xtnd map (f fn t tbl)        (tbl-map->lst f t))

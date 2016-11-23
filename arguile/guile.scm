@@ -1,13 +1,14 @@
 (module (arguile guile))
-(export _+ _* _= _apply grp expand-kwargs has-kwargs?)
-(export-syntax _let cut)
+(export _+ _* _= _length _apply grp expand-kwargs has-kwargs?)
+(export-syntax _let cut aif)
 (use (srfi srfi-1)
      (arguile loop))
 
-(define _apply apply)
 (define _+ +)
 (define _= =)
 (define _* *)
+(define _length length)
+(define _apply apply)
 
 (define-syntax _let
   (syntax-rules ()
@@ -56,3 +57,10 @@
 (define (has-kwargs? args)
   (or-map (lambda (arg) (keyword? (syntax->datum arg)))
           args))
+
+(define-syntax aif
+  (lambda (x)
+    (syntax-case x ()
+      ((_ test then else)
+       (with-syntax ((it (datum->syntax 'it x)))
+         #'(let ((it test)) (if it then else)))))))

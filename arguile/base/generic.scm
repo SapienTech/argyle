@@ -1,5 +1,5 @@
 (module (arguile base generic)
-  #:export (+ * len))
+  #:export (+ * length))
 (use (arguile base)
      (arguile guile)
      (arguile base type)) 
@@ -25,15 +25,12 @@
                      (iota (apply _* (cdr args))))))
         (else (apply _* args))))
 
-;;; Pollutes namespace right now
-#!
-(def len (x)
-  (cond ((lst? (length x)))
+(def length (x)
+  (cond ((lst? (_length x)))
         ((str? x) (str-len x))
         ((hash-table? x) (hash-count (const #t) x))
         ((vector? x) (vector-length x))
         (else (length x))))
-!#
 
 (def one-of (tests val)
   (if (null? tests) #f

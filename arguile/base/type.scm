@@ -19,9 +19,9 @@
   ((fn? x)            'fn)
   ((sym? x)           'sym)
   ((syn? x)           'syn)
-  ((hash-table? x)    'table)
+  ((hash-table? x)    'hash-tbl)
   ((chr? x)           'chr)
-  ((vector? x)        'vec)
+  ((vector? x)        'vector)
   ((kwrd? x)          'kwrd)
   ;; TODO: is null? useful as a type?
   ((null? x)          'sym)
