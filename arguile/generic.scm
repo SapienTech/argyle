@@ -5,7 +5,7 @@
      (arguile data)
      (arguile guile)
      (arguile loop)
-     ((srfi srfi-1) #:select (unzip2 map)))
+     ((srfi srfi-1) #:select (unzip2)))
 
 (mac gen
   ((_ name) (id? #'name)
@@ -23,9 +23,10 @@
 (def resolve-fn (tbl args)
   (loop lp ((for arg (in-list args))
             (where t tbl (and=> t (\\ _ (type arg)))))
-        => (if (& t (t 'fun)) (t 'fun)
-               (if (tbl 'def) (tbl 'def)
-                   (err "No generic fn for args1:" args)))
+        => (cond (t (t 'fun) (t 'fun))
+                 (t (t 'rst) (t 'rst)) 
+                 ((tbl 'def) (tbl 'def))
+                 (else (err "No generic fn for args1:" args)))
     ;; This handles rest case
     (if t
         (if (t 'rst) (t 'rst)
@@ -62,7 +63,7 @@
   (def join append)
   (def cpy lst-cpy)
   (def clr! (lst) (set-cdr! lst '()))
-  (def map map))
+  (def map (@ (ice-9 r5rs) map)))
 
 (gen len)
 (gen rev)
