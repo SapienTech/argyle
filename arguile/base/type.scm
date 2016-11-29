@@ -1,6 +1,7 @@
 (module (arguile base type)
   #:export (base-type coerce ->))
 (use (arguile base)
+     (arguile base err)
      (arguile base type lst)
      (arguile base type str)
      (arguile base type num)
@@ -14,8 +15,9 @@
 ;;; TODO: add simple heirarchy
 (def base-type (x)
  (cond
-  ((pair? x)       'pair)
-  ((lst? x)        'lst)
+  ;; TODO: nest related types
+  ;((pair? x)       'pair)
+ ((lst? x)        'lst)
   ((str? x)        'str)
   ((int? x)        'int)
   ((num? x)        'num)
@@ -33,7 +35,7 @@
 (def coerce (x to-type . args)
   (let x-type (base-type x)
     (if (eqv? to-type x-type) x
-        (w/ (fail (fn (k) (error "Can't coerce " k to-type))
+        (w/ (fail (fn args (error "Can't coerce" args '-> to-type))
              conversions (hash-ref coercions to-type fail)
              converter (hash-ref conversions x-type fail))
           (apply converter (cons x args))))))
