@@ -1,7 +1,7 @@
 (module (arguile base))
-(export =? 0? 1? flatn ~ nil? &map id? set\ defd?)
+(export =? 0? 1? flatn ~ nil? &map id? set\ defd? wrap comp)
 (export-syntax mac fn def defp let w/ do
-               fn-case & \\ ret =
+               fn-case & \\ ret = ->> inline
                re-export-modules)
 (use ((srfi srfi-1) #:select (append-map lset-difference))
      (arguile guile)
@@ -25,14 +25,15 @@
              (syntax-case x (aux ...)
                ((_ . patt) guard ... templ) ...)))))))
 
+;;; Add named fn support
 (mac fn
-  ((_ args e1 e2 ...) #'(lambda args e1 e2 ...)))
+  ((_ args body ...) #'(lambda args body ...)))
 
 (mac def x
-  ((_ name (arg1 ... . rest) e1 e2 ...)
-   #`(#,@(if (has-kwargs? #'(arg1 ...))
-             #`(define* (name #,@(expand-kwargs #'(arg1 ...) x) . rest))
-             #'(define (name arg1 ... . rest)))
+  ((_ name (arg ... . rest) e1 e2 ...)
+   #`(#,@(if (has-kwargs? #'(arg ...))
+             #`(define* (name #,@(expand-kwargs #'(arg ...) x) . rest))
+             #'(define (name arg ... . rest)))
       e1 e2 ...))
   ((_ name val) #'(define name val)))
 
@@ -72,6 +73,14 @@
 
 (mac ret ((ret var e1 e2 ...) #'(let var e1 e2 ... var)))
 
+;;; Replace w/ => when loop export is handled
+(mac ->>
+  ((_ fn ... exp) #'((compose fn ...) exp)))
+
+(mac inline
+  ((_ name (arg ... . rest) body ...)
+   #'(define-inlinable (arg ... . rest) body ...)))
+
 ;;; Make generic
 (eval-when (expand load eval)
   (def =? _=)
@@ -82,11 +91,11 @@
   (def flatn append-map)
   (def &map and-map)
   (def id? identifier?)
-  (def set\ lset-difference))
+  (def set\ lset-difference)
+  (def wrap const)
+  (def comp compose))
 
-;;; Consider how we are going to expose above defs for base
-;;; op1: put them in guile.scm
-;;; TODO: export non-used submodules to avoid code duplication
+;;; TODO: enable api modification
 (mac re-export-modules x
   ((_ m ...)
    #`(re-export 

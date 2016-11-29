@@ -6,6 +6,7 @@
 (defp c/prmt call-with-prompt)
 (defp c/vals call-with-values)
 (defp tag default-prompt-tag)
+(defp vals values)
 
 (mac $>
   ((_ exp)           #'(c/prmt (tag) (fn () exp) hdlr))
