@@ -8,7 +8,8 @@
      (arguile base type sym)
      (arguile base type syn)
      (arguile base type chr)
-     (arguile base type kwrd))
+     (arguile base type kwrd)
+     (arguile base type strm))
 
 ;;; TODO: add simple heirarchy
 (def base-type (x)
@@ -105,4 +106,5 @@
  (arguile base type sym)
  (arguile base type syn)
  (arguile base type chr)
- (arguile base type kwrd))
+ (arguile base type kwrd)
+ (arguile base type strm))
