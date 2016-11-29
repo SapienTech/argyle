@@ -1,7 +1,6 @@
 (module (arguile base type sym))
 (use (arguile base))
 
-(defp sym symbol)
 (defp sym? symbol?)
 (defp sym->kwrd symbol->keyword)
 (defp sym->str symbol->string)

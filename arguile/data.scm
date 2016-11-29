@@ -1,5 +1,5 @@
 (module (arguile data)
-  #:export (data data? data-type? data-type))
+    #:export (data data? data-type? data-type))
 (use (arguile base)
      (arguile data records)
      ((srfi srfi-1) #:select (first)))

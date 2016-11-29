@@ -3,7 +3,6 @@
 
 ;;; Standardize a macro for ref, set, copy, etc
 
-(defp str string)
 (defp str? string?)
 (defp str: string-ref)
 (defp str! string-set!)

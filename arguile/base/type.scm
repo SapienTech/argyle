@@ -10,31 +10,34 @@
      (arguile base type chr)
      (arguile base type kwrd))
 
+;;; TODO: add simple heirarchy
 (def base-type (x)
  (cond
-  ((lst? x)           'lst)
-  ;((pair? x)          'pair)
-  ((str? x)           'str)
-  ((num? x)           'num)
-  ((fn? x)            'fn)
-  ((sym? x)           'sym)
-  ((syn? x)           'syn)
-  ((hash-table? x)    'hash-tbl)
-  ((chr? x)           'chr)
-  ((vector? x)        'vector)
-  ((kwrd? x)          'kwrd)
+  ((pair? x)       'pair)
+  ((lst? x)        'lst)
+  ((str? x)        'str)
+  ((int? x)        'int)
+  ((num? x)        'num)
+  ((fn? x)         'fn)
+  ((sym? x)        'sym)
+  ((syn? x)        'syn)
+  ((hash-table? x) 'hash-tbl)
+  ((chr? x)        'chr)
+  ((vector? x)     'vector)
+  ((kwrd? x)       'kwrd)
   ;; TODO: is null? useful as a type?
-  ((null? x)          'sym)
-  (else               (error "Type: unknown type" x))))
+  ((null? x)       'sym)
+  (else            (error "Type: unknown type" x))))
 
 (def coerce (x to-type . args)
   (let x-type (base-type x)
     (if (eqv? to-type x-type) x
-        (w/ (fail (fn () (error "Can't coerce " x to-type))
+        (w/ (fail (fn (k) (error "Can't coerce " k to-type))
              conversions (hash-ref coercions to-type fail)
              converter (hash-ref conversions x-type fail))
           (apply converter (cons x args))))))
 
+;;; Deprecated: use base type constructors, or data converter
 (mac -> ((_ type obj . args) #'(coerce obj 'type . args)))
 
 (def coercions
@@ -57,23 +60,24 @@
             (kwrd ,(fn (dat ctx) (dat->syn ctx dat))))
        (str (int ,num->str)
             (num ,num->str)
-            (chr ,str)
-            ;; TODO: use \\
-            (sym ,(fn (x) (if (eqv? x 'nil) "" (sym->str x)))))
+            (chr ,string)
+            (sym ,(fn (x) (if (eqv? x (symbol)) "" (sym->str x)))))
        
        (sym (str ,str->sym)
-            (chr ,(fn (c) (str->sym (str c)))))
+            (chr ,(fn (c) (str->sym (string c))))
+            (num ,(\\ (comp str->sym num->str) _)))
        
        (int (chr ,(fn (c . args) (chr->int c)))
             (num ,(fn (x . args) (iround x)))
             (str ,(fn (x . args)
-                    (let n (apply str->num '(x args))
+                    ;; aif it
+                    (let n (str->num x)
                       (if n (iround n)
-                          (error "Can't coerce " x 'int))))))
+                          (err "Can't coerce" x '-> 'int))))))
        
        (num (str ,(fn (x . args)
-                    (or (apply str->num '(x args))
-                        (error "Can't coerce " x 'num))))
+                    (or (str->num x)
+                        (err "Can't coerce " x '-> 'num))))
             (int ,(fn (x) x)))
        
        (chr (int ,int->chr)
@@ -82,6 +86,16 @@
     coercions))
 
 (def iround (compose inexact->exact round))
+
+(mac export-type-ctrs
+  ((_ t1 ...)
+   #`(do #,@(map (fn (t)
+                   #`(defp #,t (obj . args)
+                       (apply coerce obj '#,t args)))
+                 #'(t1 ...)))))
+
+;;; Exporting type constructors
+(export-type-ctrs str num int sym syn dat chr)
 
 (re-export-modules 
  (arguile base type lst)
