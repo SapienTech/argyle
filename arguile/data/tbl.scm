@@ -4,15 +4,15 @@
      (arguile data))
 
 ;;; TODO: allow init size and comparison operators
-(data tbl (t)
-      #:init (%make-tbl t)
+(trans tbl (t)
+      #:init (%mke-tbl t)
       #:app (fn-case
              (() (tbl-t self))
              ((k) (hash-ref (tbl-t self) k))
              ((k v) (hash-set! (tbl-t self) k v))))
 
-(defp make-tbl (#:o n)
-  (%make-tbl (if n (make-hash-table n) (make-hash-table))))
+(defp mke-tbl (#:o (n 0))
+  (%mke-tbl (make-hash-table n)))
 (defp tbl: (t k) (t k))
 (defp tbl! (t k obj) (t k obj))
 (defp tbl-del! (t k) (hash-remove! (t) k))

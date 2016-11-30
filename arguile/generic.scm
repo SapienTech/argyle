@@ -13,7 +13,7 @@
                                 #,(when (defd? (-> dat #'name))
                                   #'(t 'def name)))))))
 
-(data gen-fn (name tbl)
+(trans gen-fn (name tbl)
       #:init (%gen-fn name tbl)
       #:app (fn args
               (apply (resolve-fn (gen-fn-tbl self) args)

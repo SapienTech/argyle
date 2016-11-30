@@ -1,5 +1,5 @@
 (module (arguile data q)
-  #:export (q make-q %make-q q? q-nil?
+  #:export (q %mke-q q? q-nil?
             enq! deq!
             q-hd q-hd! q-tl q-tl! q-len q-len! q-fn q-fn!
             q->lst lst->q q->vec vec->q))
@@ -7,13 +7,13 @@
      (arguile data)
      (arguile data vec))
 
-(data q (len hd tl)
-      #:init (%make-q len hd tl)
+(trans q (len hd tl)
+      #:init (%mke-q len hd tl)
       #:app (case-lambda
               (() (deq! self))
               ((k) (enq! self k))))
 
-(defp make-q () (%make-q 0 '() '()))
+(defp mke-q () (%mke-q 0 '() '()))
 (defp q-nil? (q) (0? (q-len q)))
 
 (defp enq! (q obj)
@@ -38,7 +38,7 @@
   (append (q-hd q) (reverse (q-tl q))))
 
 (defp lst->q (lst)
-  (%make-q (length lst) lst '()))
+  (%mke-q (length lst) lst '()))
 
 (defp q->vec (compose lst->vec q->lst))
 (defp vec->q (compose lst->q vec->lst))

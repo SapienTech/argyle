@@ -5,17 +5,16 @@
      (srfi srfi-43))
 
 ;;; TODO: add optional fill
-(data vec (v)
-      #:init (%make-vec v)
+(trans vec (v)
+      #:init (%mke-vec v)
       #:app (let v (vec-v self)
               (fn-case
                (() v)
                ((k) (vector-ref v k))
                ((k obj) (vector-set! v k obj)))))
 
-(defp make-vec (len . fill)
-  (%make-vec (if (nil? fill) (make-vector len)
-                 (make-vector len (car fill)))))
+(defp mke-vec (len #:o fill)
+  (%mke-vec (make-vector len fill)))
 (defp vec: (v k) (v k))
 (defp vec! (v k obj) (v k obj))
 (defp vec-len (v) (vector-length (v)))
