@@ -2,11 +2,10 @@
 (export =? 0? 1? flatn ~ nil? &map id? set\ defd? wrap comp)
 (export-syntax mac fn def defp let w/ do
                fn-case & \\ ret = ->> inline
-               re-export-modules)
+               re-export-modules aif it)
 (use ((srfi srfi-1) #:select (append-map lset-difference))
      (arguile guile)
      (ice-9 receive))
-(re-export-syntax aif)
 
 ;;; Consider moving this to guile.scm
 (define-syntax mac
@@ -67,6 +66,11 @@
 (mac fn-case
   ((_ fn1 fn2 ...) #'(case-lambda fn1 fn2 ...)))
 
+(mac aif x
+  ((_ test then else)
+   (let-syn it (syn 'it x)
+     #'(let it test (if it then else)))))
+
 (mac & ((_ e1 ...) #'(and e1 ...)))
 
 (mac \\ ((\\ fn args ...) #'(cut fn args ...)))
@@ -78,8 +82,8 @@
   ((_ fn ... exp) #'((compose fn ...) exp)))
 
 (mac inline
-  ((_ name (arg ... . rest) body ...)
-   #'(define-inlinable (arg ... . rest) body ...)))
+  ((_ name (arg ...) body ...)
+   #'(define-inlinable (name arg ...) body ...)))
 
 ;;; Make generic
 (eval-when (expand load eval)
