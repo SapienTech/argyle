@@ -7,9 +7,11 @@
      (arguile loop)
      ((srfi srfi-1) #:select (unzip2)))
 
+;;; TODO: generic macros?
+
 (mac gen
   ((_ name) (id? #'name)
-   #`(def name (%gen-fn 'name (ret t (make-tbl)
+   #`(def name (%gen-fn 'name (ret t (mke-tbl)
                                 #,(when (defd? (-> dat #'name))
                                   #'(t 'def name)))))))
 
@@ -45,14 +47,14 @@
      #`(loop ((for type  (in-list 'types))
               (where tbl (gen-fn-tbl name)
                 (if (tbl type) (tbl type)
-                     (tbl type (make-tbl)))))
+                     (tbl type (mke-tbl)))))
         => (tbl 'rst (fn (#,@#'args . rest) body ...)))))
   ((_ name (arg1 ...) body ...) (defd? (-> dat #'name))
    (let-syn (args types) (split #'(arg1 ...))
      #`(loop ((for type  (in-list 'types))
               (where tbl (gen-fn-tbl name)
                 (if (tbl type) (tbl type)
-                     (tbl type (make-tbl)))))
+                     (tbl type (mke-tbl)))))
         => (tbl 'fun (fn args body ...))))))
 
 (eval-when (expand load eval)
@@ -76,16 +78,16 @@
 (xtnd len (v vec) (vec-len v))
 (xtnd len (q q) (q-len q))
 
-(xtnd rev (v vec) (ret v* (make-vec (vec-len v))
+(xtnd rev (v vec) (ret v* (mke-vec (vec-len v))
                    (vec<-! v 0 (vec-len v) v* 0)))
 
 (xtnd join (s1 str . rest) (apply str-join s1 rest))
 (xtnd join (v1 vec v2 vec) (w/ (l1 (vec-len v1) l2 (vec-len v2))
-                             (ret v (make-vec (+ l1 l2))
+                             (ret v (mke-vec (+ l1 l2))
                                (vec->! v1 0 l1 v 0)
                                (vec->! v2 0 l2 v l1))))
 (xtnd cpy (v vec) (vec-cpy v))
-(xtnd cpy (q q) (%make-q (q-len q) (q-hd q) (q-tl q)))
+(xtnd cpy (q q) (%mke-q (q-len q) (q-hd q) (q-tl q)))
 
 (xtnd clr! (t tbl) (tbl-clr! t))
 (xtnd clr! (q q) (q-hd! q '()) (q-tl! q '()) (q-len! q 0))
