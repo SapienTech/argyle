@@ -31,9 +31,8 @@
                  (else (err "No generic fn for args1:" args)))
     ;; This handles rest case
     (if t
-        (if (t 'rst) (t 'rst)
-            (lp))
-        (if (tbl 'def) (tbl 'def)
+        (aif (t 'rst) it (lp))
+        (aif (tbl 'def) it 
             (err "No generic fn for args:" args)))))
 
 (def type (x)

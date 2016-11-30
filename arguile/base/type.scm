@@ -73,10 +73,8 @@
        (int (chr ,(fn (c . args) (chr->int c)))
             (num ,(fn (x . args) (iround x)))
             (str ,(fn (x . args)
-                    ;; aif it
-                    (let n (str->num x)
-                      (if n (iround n)
-                          (err "Can't coerce" x '-> 'int))))))
+                    (aif (str->num x) (iround it)
+                         (err "Can't coerce" x '-> 'int)))))
        
        (num (str ,(fn (x . args)
                     (or (str->num x)
