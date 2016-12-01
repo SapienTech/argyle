@@ -48,14 +48,15 @@
   (def %data (ctx imm? syn-exp)
     (syn-case syn-exp ()
      ((_ name (field ...) #:init (mke arg ...) spec ... #:app fn)
-      (let name' (-> dat #'name)
-        (w/syn (%mke (-> syn (+ '% (-> dat #'mke)) ctx)
-                pred (-> syn (+ name' '?) ctx)
+      (let name' (dat #'name)
+        (w/syn (type (syn (+ '< name' '>) ctx)
+                %mke (syn (+ '% (dat #'mke)) ctx)
+                pred (syn (+ name' '?) ctx)
                 (app app: app!) (mke-app-spec name' ctx)
-                self (-> syn 'self ctx))
+                self (syn 'self ctx))
           #`(do (#,(if imm? #'define-immutable-record-type
                        #'define-record-type)
-                 name
+                 type
                  (%mke arg ...) pred
                  (app app: app!)
                  #,@(mke-field-specs name' #'(field ...) #'(spec ...) ctx)
@@ -64,8 +65,7 @@
              (#,(if imm? #'let #'ret)
               self (apply %mke args) (app! self fn)))))))))
 
-  (def std-mke (name ctx)
-    (-> syn (+ 'mke- (-> dat name)) ctx))
+  (def std-mke (name ctx) (syn (dat name) ctx))
 
   (def mke-app-spec (name ctx)
     (-> syn (mke-field-spec name 'fn) ctx))
