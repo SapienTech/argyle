@@ -1,6 +1,7 @@
 (module (arguile base))
 (export =? 0? 1? flatn ~ nil? &map id? set\ defd? wrap comp)
-(export-syntax mac fn def defp let w/ do
+(export-syntax mac mac? syn-case let-syn w/syn
+               fn def defp let w/ do
                fn-case & \\ ret = ->> inline
                re-export-modules aif it)
 (use ((srfi srfi-1) #:select (append-map lset-difference))
@@ -23,6 +24,25 @@
            (lambda (x)
              (syntax-case x (aux ...)
                ((_ . patt) guard ... templ) ...)))))))
+
+(mac mac?
+  ((_ mac) #'(macro? (module-ref (current-module) 'mac))))
+
+
+
+(mac syn-case
+  ((_ ctx (aux ...) ((kword . patt) templ) ...)
+   #'(syntax-case ctx (aux ...)
+       ((kword . patt) templ) ...)))
+
+(mac let-syn
+  ((_ syn exp body ...)
+   #'(w/syn (syn exp) body ...)))
+
+(mac w/syn
+  ((_ (item ...) e1 ...)
+   (with-syntax ((items (grp #'(item ...) 2)))
+     #'(with-syntax items e1 ...))))
 
 ;;; Add named fn support
 (mac fn
@@ -68,7 +88,7 @@
 
 (mac aif x
   ((_ test then else)
-   (let-syn it (syn 'it x)
+   (let-syn it (datum->syntax x 'it)
      #'(let it test (if it then else)))))
 
 (mac & ((_ e1 ...) #'(and e1 ...)))
