@@ -1,5 +1,5 @@
 (module (arguile base type kwrd))
-(use (arguile base))
+(use (arguile base fn))
 
 (defp kwrd? keyword?)
 (defp kwrd->sym keyword->symbol)

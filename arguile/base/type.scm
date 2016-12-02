@@ -1,7 +1,10 @@
 (module (arguile base type)
   #:export (base-type coerce ->))
-(use (arguile base)
+(use (arguile base mac)
+     (arguile base fn)
+     (arguile base ctrl)
      (arguile base err)
+     (arguile base module)
      (arguile base type lst)
      (arguile base type str)
      (arguile base type num)
@@ -96,6 +99,7 @@
                  #'(t1 ...)))))
 
 ;;; Exporting type constructors
+
 (export-type-ctrs str num int sym syn dat chr)
 
 (re-export-modules 

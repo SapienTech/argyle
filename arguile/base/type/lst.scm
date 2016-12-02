@@ -1,5 +1,5 @@
 (module (arguile base type lst))
-(use (arguile base))
+(use (arguile base fn))
 
 (defp lst list)
 (defp lst? list?)

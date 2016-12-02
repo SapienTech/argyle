@@ -1,6 +1,7 @@
 (module (arguile base io)
   #:export (pr prn prnn))
-(use (arguile base))
+(use (arguile base mac)
+     (arguile base ctrl))
 
 (mac pr
   ((_ v1) #'(display v1))

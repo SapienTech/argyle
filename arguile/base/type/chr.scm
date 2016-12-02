@@ -1,5 +1,5 @@
 (module (arguile base type chr))
-(use (arguile base))
+(use (arguile base fn))
 
 (defp chr? char?)
 (defp chr=? char=?)

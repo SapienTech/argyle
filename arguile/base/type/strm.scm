@@ -1,5 +1,6 @@
 (module (arguile base type strm))
-(use (arguile base)
+(use (arguile base fn)
+     (arguile base mac)
      (srfi srfi-41)
      (srfi srfi-45))
 (export scons sfn slet strm-match strm-of)

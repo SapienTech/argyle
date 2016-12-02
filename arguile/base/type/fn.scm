@@ -1,5 +1,6 @@
 (module (arguile base type fn))
-(use (arguile base))
+(use (arguile base fn))
+
 (defp fun procedure)
 (defp fn-doc procedure-documentation)
 (defp fn-min-arity procedure-minimum-arity)

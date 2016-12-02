@@ -1,5 +1,5 @@
 (module (arguile base type str))
-(use (arguile base))
+(use (arguile base fn))
 
 ;;; Standardize a macro for ref, set, copy, etc
 

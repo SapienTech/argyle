@@ -1,6 +1,6 @@
 (module (arguile base type syn)
     #:export (syn? syn->dat dat->syn))
-(use (arguile base)
+(use (arguile base fn)
      (arguile guile))
 
 (def syn? (obj)

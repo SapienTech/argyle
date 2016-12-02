@@ -1,5 +1,5 @@
 (module (arguile base type num))
-(use (arguile base))
+(use (arguile base fn))
 
 (defp num? number?)
 (defp num->str number->string)

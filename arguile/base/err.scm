@@ -1,4 +1,4 @@
 (module (arguile base err))
-(use (arguile base))
+(use (arguile base fn))
 
 (defp err error)

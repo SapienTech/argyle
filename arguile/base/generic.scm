@@ -1,7 +1,7 @@
 (module (arguile base generic)
   #:export (+ * length))
-(use (arguile base)
-     (arguile guile)
+(use (arguile guile)
+     (arguile base fn)
      (arguile base type)) 
 
 (def + args
