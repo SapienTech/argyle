@@ -1,10 +1,9 @@
 (module (arguile base fn)
-    #:export (comp wrap id?))
+    #:export (comp id? defd? wrap))
 (export-syntax fn fn-case def defp let ret w/ \\ ->> inline)
 (use (arguile guile)
      (arguile base mac)
      (ice-9 receive))
-
 
 (mac fn
   ((_ args body ...) #'(lambda args body ...)))
