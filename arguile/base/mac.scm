@@ -1,6 +1,8 @@
 (module (arguile base mac)
-    #:export (mac mac? syn-case let-syn w/syn))
-(use (arguile guile))
+    #:export (mac mac? syn-case let-syn w/syn
+              syn-param w/syn-params gen-tmps))
+(use (arguile guile)
+     (arguile base fn))
 
 (define-syntax mac
   (lambda (ctx)
@@ -34,3 +36,14 @@
   ((_ (item ...) e1 ...)
    (with-syntax ((items (grp #'(item ...) 2)))
      #'(with-syntax items e1 ...))))
+
+(mac syn-param
+  ((_ name fn) #'(define-syntax-parameter name fn)))
+
+;;; TODO: change to w/ format
+(mac w/syn-params
+  ((_ ((param val) ...) body ...)
+   #'(syntax-parameterize ((param val) ...) body ...)))
+
+(mac gen-tmps
+  ((_ syn) #'(generate-temporaries syn)))
