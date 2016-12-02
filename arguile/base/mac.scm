@@ -1,8 +1,7 @@
 (module (arguile base mac)
     #:export (mac mac? syn-case let-syn w/syn
               syn-param w/syn-params gen-tmps))
-(use (arguile guile)
-     (arguile base fn))
+(use (arguile guile))
 
 (define-syntax mac
   (lambda (ctx)
