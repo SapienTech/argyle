@@ -1,23 +1,48 @@
 (module (arguile base mac)
     #:export (mac mac? syn-case let-syn w/syn
               syn-param w/syn-params gen-tmps))
-(use (arguile guile))
+(use (arguile guile)
+     (ice-9 receive))
 
 (define-syntax mac
-  (lambda (ctx)
-    (syntax-case ctx ()
-      ((mac name ((_ . patt) guard ... templ) ...)
-       #'(mac name x () ((_ . patt) guard ... templ) ...))
-      ((mac name x ((_ . patt) guard ... templ) ...)
-       (identifier? #'x)
-       #'(mac name x () ((_ . patt) guard ... templ) ...))
-      ((mac name (aux ...) ((_ . patt) guard ... templ) ...)
-       #'(mac name x (aux ...) ((_ . patt) guard ... templ) ...))
-      ((mac name x (aux ...) ((_ . patt) guard ... templ) ...)
-       #'(define-syntax name
-           (lambda (x)
-             (syntax-case x (aux ...)
-               ((_ . patt) guard ... templ) ...)))))))
+  (lambda (x)
+    (define (ids? exps)
+      (and-map identifier? exps))
+    (syntax-case x ()
+      ((_ name ctx (f1 ...) exp ...)
+       (and (and-map identifier? `(,#'name ,#'ctx))
+            (ids? #'(f1 ...)))
+       #'(%mac name ctx (f1 ...) exp ...))
+      ((_ name ctx exp ...)
+       (and-map identifier? `(,#'name ,#'ctx))
+       #'(mac name ctx () exp ...))
+      ((_ name (f1 ...) exp ...)
+       (ids? #'(f1 ...))
+       #'(mac name ctx (f1 ...) exp ...))
+      ((_ name exp ...)
+       (identifier? #'name)
+       #'(mac name ctx () exp ...)))))
+
+(define-syntax %mac
+  (lambda (x)
+    (define (parse-mac exps)
+      (define (pattern? exp)
+        (syntax-case exp ()
+        (((_ . patt) guard ... templ) #t)
+        (_ #f)))
+      (let lp ((exps exps) (defs '()) (patts '()))
+        (if (null? exps) (values (reverse defs) (reverse patts))
+            (if (pattern? (car exps))
+                (lp (cdr exps) defs (cons (car exps) patts))
+                (lp (cdr exps) (cons (car exps) defs) patts)))))
+    (syntax-case x ()
+      ((_ name ctx (f1 ...) exp ...)
+       #`(define-syntax name
+           (lambda (ctx)
+             #,@(receive (defs cases) (parse-mac #'(exp ...))
+                  (if (null? cases) defs
+                      #`(#,@defs
+                          (syntax-case ctx (f1 ...) #,@cases))))))))))
 
 (mac mac?
   ((_ mac) #'(macro? (module-ref (current-module) 'mac))))
