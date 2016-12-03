@@ -41,6 +41,8 @@
 
 ;;; Going to straight cpy for this version
 (mac xtnd x
+  (def split (lst)
+    (c/vals (fn () (unzip2 (grp lst 2))) list))
   ((_ name (arg1 ... . rest) body ...) (~(nil? #'rest))
    (let-syn (args types) (split #'(arg1 ...))
      #`(loop ((for type  (in-list 'types))
@@ -50,6 +52,7 @@
         => (tbl 'rst (fn (#,@#'args . rest) body ...)))))
   ((_ name (arg1 ...) body ...) (defd? (-> dat #'name))
    (let-syn (args types) (split #'(arg1 ...))
+            ;; TODO: refactor
      #`(loop ((for type  (in-list 'types))
               (where tbl (gen-fn-tbl name)
                 (if (tbl type) (tbl type)
@@ -57,8 +60,6 @@
         => (tbl 'fun (fn args body ...))))))
 
 (eval-when (expand load eval)
-  (def split (lst)
-    (c/vals (fn () (unzip2 (grp lst 2))) list))
   (def len length)
   (def rev reverse)
   (def join append)
