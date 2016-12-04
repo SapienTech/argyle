@@ -3,7 +3,7 @@
             monad monad? monad-bind monad-return
 
             ;; Syntax.
-            >>= return w/monad mlet mlet* mbegin mwhen munless
+            >>= return w/monad mlet mlet* mdo mwhen munless
             lift0 lift1 lift2 lift3 lift4 lift5 lift6 lift7 lift
             listm foldm mapm seq anym
 
@@ -104,38 +104,38 @@ form is (VAR -> VAL), bind VAR to the non-monadic value VAL in the same way as
          (_let ((var temp) ...)
            body ...)))))
 
-(mac mbegin 
+(mac mdo 
   "Bind the given monadic expressions in seq, returning the result of
 the last one."
   ((_ %curr-monad mexp) #'mexp)
   ((_ %curr-monad mexp rest ...)
    #'(>>= mexp
           (fn (unused-value)
-            (mbegin %curr-monad rest ...))))
+            (mdo %curr-monad rest ...))))
   ((_ monad mexp)
    #'(w/monad monad mexp))
   ((_ monad mexp rest ...)
    #'(w/monad monad
        (>>= mexp
             (fn (unused-value)
-              (mbegin monad rest ...))))))
+              (mdo monad rest ...))))))
 
 (mac mwhen
-  "When CONDITION is true, evaluate EXP0..EXP* as in an 'mbegin'.  When
+  "When CONDITION is true, evaluate EXP0..EXP* as in an 'mdo'.  When
 CONDITION is false, return *unspecified* in the curr monad."
   ((_ condition exp0 exp* ...)
    #'(if condition
-         (mbegin %curr-monad
+         (mdo %curr-monad
            exp0 exp* ...)
          (return *unspecified*))))
 
 (mac munless
-  "When CONDITION is false, evaluate EXP0..EXP* as in an 'mbegin'.  When
+  "When CONDITION is false, evaluate EXP0..EXP* as in an 'mdo'.  When
   CONDITION is true, return *unspecified* in the curr monad."
   ((_ condition exp0 exp* ...)
    #'(if condition
          (return *unspecified*)
-         (mbegin %curr-monad
+         (mdo %curr-monad
            exp0 exp* ...))))
 
 (mac def-lift
@@ -149,7 +149,7 @@ CONDITION is false, return *unspecified* in the curr monad."
             (w/monad monad
               (return (proc args ...)))))
        ((liftn id)
-        (identifier? #'id)
+        (id? #'id)
         ;; Slow path: Return a closure-returning procedure (we don't
         ;; guarantee (eq? LIFTN LIFTN), but that's fine.)
         #'(fn (proc monad)
@@ -246,10 +246,8 @@ value for which MPROC returns a true monadic value or #f.  For example:
   "Return a monadic list in MONAD from the monadic vals MVAL."
   ((_ monad mval ...)
    (let-syn (val ...) (gen-tmps #'(mval ...))
-            #'(mlet monad ((val mval) ...)
-                (return (list val ...))))))
-
-
+     #'(mlet monad ((val mval) ...)
+         (return (list val ...))))))
 
 (inline identity-return (value)
   value)
@@ -269,12 +267,12 @@ value for which MPROC returns a true monadic value or #f.  For example:
   "Bind MVALUE, a value in the state monad, and pass it to MPROC."
   (fn (state)
     (c/vals
-        (fn ()
-          (mvalue state))
-      (fn (value state)
-        ;; Note: as of Guile 2.0.11, declaring a variable to hold the result
-        ;; of (mproc value) prevents a bit of unfolding/inlining.
-        ((mproc value) state)))))
+     (fn ()
+       (mvalue state))
+     (fn (value state)
+       ;; Note: as of Guile 2.0.11, declaring a variable to hold the result
+       ;; of (mproc value) prevents a bit of unfolding/inlining.
+       ((mproc value) state)))))
 
 (monad state-monad
   (bind state-bind)
