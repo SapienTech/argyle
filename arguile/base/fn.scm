@@ -23,7 +23,8 @@
   ((_ name . rest) #'(begin (def name . rest) (export name))))
 
 (mac let
-  ((_ var val e1 e2 ...) #'(w/ (var val) e1 e2 ...)))
+  ((_ var val e1 e2 ...) #'(w/ (var val) e1 e2 ...))
+  ((_ () e1 e2 ...) #'(_let () e1 e2 ...)))
 
 (mac ret ((ret var e1 e2 ...) #'(let var e1 e2 ... var)))
 

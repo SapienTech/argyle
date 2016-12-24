@@ -7,8 +7,6 @@
      (arguile loop)
      ((srfi srfi-1) #:select (unzip2)))
 
-;;; TODO: generic macros?
-
 (mac gen
   ((_ name) (id? #'name)
    #`(def name (%gen-fn 'name (ret t (mke-tbl)
