@@ -1,6 +1,7 @@
 (module (arguile conc)
-    #:export (futr doasync))
+    #:export (futr doasync dosync ref @))
 (use (arguile base)
+     (arguile generic)
      (arguile guile)
      (arguile loop)
      (arguile data)
@@ -23,24 +24,26 @@
 
 (defp ref (val) (%ref val (make-mutex)))
 
-;;; TODO: figure out issue with nested with-mutex :(
 (mac dosync x
      ((_ (refs ...) body ...) 
       (let ref-dats (map (fn (ref) (syn->dat ref)) #'(refs ...))
-        (with-syntax (((ref-cpys ...) (map (fn (ref) (datum->syntax x ref)) ref-dats))
-                      (refs* (gen-tmps #'(refs ...)))) ; Not sure if needed
+        (with-syntax (((ref-cpys ...) (map (fn (ref) (datum->syntax x ref))
+                                           ref-dats)))
           #`(w/refs (refs ...)
               (let refs* (_let #,(zip #'(ref-cpys ...)
                                       (map (fn (ref) #`(cpy-ref #,ref))
                                            #'(refs ...)))
                                body ...
                                (list ref-cpys ...))
-                ;; TODO: figure out why ref* is a lst
-                #,@(map (fn (ref ref*)
-                            #`(set! #,ref (ref-val! #,ref
-                                                    (ref-val (car #,ref*)))))
-                        #'(refs ...)
-                        #'refs*)))))))
+                (set-refs! (refs ...) refs*)))))))
+
+(mac set-refs!
+     ((_ (refs ...) vals)
+      #`(do #,@(map (fn (ref val) #`(set! #,ref (ref-val! #,ref (ref-val #,val))))
+                    #'(refs ...)
+                    #`(#,@(map (fn (i) #`(list-ref vals #,i))
+                               (iota (_length #'(refs ...)))))))))
+
 (mac w/refs
   ((_ (r1 ...) e1 ...)
    #`(w/mutxs #,(map (fn (ref) #`(ref-mutx #,ref))
