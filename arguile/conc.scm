@@ -1,8 +1,10 @@
 (module (arguile conc)
     #:export (futr doasync))
 (use (arguile base)
+     (arguile guile)
      (arguile loop)
      (arguile data)
+     ((srfi srfi-1) #:select (zip))
      (ice-9 futures)
      (ice-9 threads))
 
@@ -21,21 +23,29 @@
 
 (defp ref (val) (%ref val (make-mutex)))
 
-(mac dosync-wip x
-     ((_ (refs ...) e0 ...)
-      (let ref-lst (map (fn (ref)
-                          (let-syn ref ref
-                           #'(cons ref
-                                   (ref-mutx! ref (make-mutex)))))
-                        #'(refs ...))
-        #`(w/refs (refs ...)
-                  (prn ref-lst)
-                  e0 ...
-                  #,@(map (fn (ref ref-pair)
-                            (w/syn (ref ref ref-pair ref-pair)
-                              #'(set! ref (cdr ref-pair))))
-                          #'(refs ...)
-                          ref-lst)))))
+;;; TODO: figure out issue with nested with-mutex :(
+(mac dosync x
+     ((_ (refs ...) body ...) 
+      (let ref-dats (map (fn (ref) (syn->dat ref)) #'(refs ...))
+        (with-syntax (((ref-cpys ...) (map (fn (ref) (datum->syntax x ref)) ref-dats))
+                      (refs* (gen-tmps #'(refs ...)))) ; Not sure if needed
+          #`(w/refs (refs ...)
+              (let refs* (_let #,(zip #'(ref-cpys ...)
+                                      (map (fn (ref) #`(cpy-ref #,ref))
+                                           #'(refs ...)))
+                               body ...
+                               (list ref-cpys ...))
+                ;; TODO: figure out why ref* is a lst
+                #,@(map (fn (ref ref*)
+                            #`(set! #,ref (ref-val! #,ref
+                                                    (ref-val (car #,ref*)))))
+                        #'(refs ...)
+                        #'refs*)))))))
+(mac w/refs
+  ((_ (r1 ...) e1 ...)
+   #`(w/mutxs #,(map (fn (ref) #`(ref-mutx #,ref))
+                     #'(r1 ...))
+              e1 ...)))
 
 (mac w/mutxs
   ((_ (m1 ...) e1 ...)
@@ -44,14 +54,10 @@
                    #`(with-mutex #,(car ms)
                        #,(lp (cdr ms))))))))
 
-(mac w/refs
-  ((_ (m1 ...) e1 ...)
-   #`(#,@(loop lp ((ms #'(m1 ...)))
-               (if (nil? ms) #'(do e1 ...)
-                   #`(with-mutex (ref-mutx #,(car ms))
-                       #,(lp (cdr ms))))))))
-
 (mac alter
-  ((_ ref val)
+  ((_ ref val) 
    #'(with-mutex (ref-mutx ref)
        (set! ref (ref-val! ref val))))) 
+
+(eval-when (expand load eval)
+  (def cpy-ref (ref) (ref-mutx! ref (make-mutex))))
