@@ -1,6 +1,7 @@
 (module (arguile data tbl)
   #:export (tbl tbl? tbl-t tbl-t! tbl-fn tbl-fn!))
 (use (arguile base)
+     ((arguile guile) :select (grp))
      (arguile data))
 
 ;;; TODO: allow init size and comparison operators
@@ -11,8 +12,12 @@
              ((k) (hash-ref (tbl-t self) k))
              ((k v) (hash-set! (tbl-t self) k v))))
 
+;;; Consider using w/tbl as dflt ctor
 (defp mke-tbl (#:o (n 0))
   (%mke-tbl (make-hash-table n)))
+(defp tbl-init args
+  (ret tbl (mke-tbl)
+       (for-each (\\ apply tbl _) (grp args 2))))
 (defp tbl: (t k) (t k))
 (defp tbl! (t k obj) (t k obj))
 (defp tbl-del! (t k) (hash-remove! (t) k))
