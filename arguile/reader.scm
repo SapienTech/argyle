@@ -1,24 +1,27 @@
-(define-module (arguile reader))
+(module (arguile reader))
+(use (arguile base)
+     (arguile loop)
+     (arguile generic)
+     (rnrs io ports))
 
-;;; Will use default scm until i add my own arguile geiser file...
 
-;;; First assuming that we can't do inner quoting
-;;; Doesn't work to quote things sequentially?
+(read-disable 'square-brackets)
+
+;; TODO: allow nested vectors
 (read-hash-extend
  #\[
- (lambda (chr prt)
-   (let lp ((acc '(#\( #\#)))
-     (let ((nxt (read-char prt)))
-       (case nxt
-         ((#\]) (string->symbol
-                 (list->string
-                  (reverse (cons #\) acc)))))
-         (else (lp (cons nxt acc))))))))
-
-(read-hash-extend
- #\y
- (lambda (chr prt)
-   "(* 2 3)"))
-
-;;; The ones that i want: vector and map rules
-;;; TODO: build some sweet reader macros
+ (fn (chr prt)
+     (let end "]"
+       `(vector ,@(loop lp ((nxt (get-datum prt)))
+                        (if (symbol? nxt)
+                            (let matches (list-matches end (symbol->string nxt))
+                              (if (~(nil? matches))
+                                  (let match (car matches)
+                                    `(,@(let sub-str (substring
+                                                     (match:string match) 0
+                                                     (match:start match))
+                                         (if (string=? sub-str "") '()
+                                             (aif (string->number sub-str) `(,it)
+                                                  `(,(string->symbol sub-str)))))))
+                                  `(,nxt ,@(lp (read prt)))))
+                            `(,nxt ,@(lp (read prt)))))))))
