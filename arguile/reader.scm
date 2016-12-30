@@ -7,85 +7,54 @@
      (ice-9 regex)
      (ice-9 match)                      ; tmp
      (rnrs io ports)
-     ((srfi srfi-1) #:select (reduce zip delete-duplicates)))
+     ((srfi srfi-1) #:select (reduce zip delete-duplicates drop)))
 
 (read-disable 'square-brackets)
 
-;;; TODO: pre-compute regex
-;;; make recursive
-(def readr-xtnd (chr ctor #:o strt end)
-  (def parse (prt)
-    (def parse-sym (sym-exp)
-      (loop lp ((for exp (in-list (str-split regx (str sym-exp)))))
-        => '()
-        (cond                           ; match fails here for some reason
-         ((string=? exp end) '())
-         (else `(,(->dat exp) ,@(lp))))))
-    (let nxt (get-datum prt)
-      (cond ((eof-object? nxt) '())
-            ((sym? nxt) (parse-sym nxt)) ; Assumind we are at the end
-            (else `(,nxt ,@(parse prt))))))
+;;; TODO: better names
+(def xtnd-readr (chr ctor #:o strt end)
   (def regx (join "[" end strt "]"))
-  
+  (def mke-buff (sym-exp)
+    (str-split regx (str sym-exp)))
+  (def mke-struct (obj prt #:o (buff '()))
+    (if (nil? buff)
+        (let nxt (get-datum prt)
+          (cond ((eof-object? nxt) obj)
+                ((sym? nxt) (mke-struct obj prt (mke-buff nxt)))
+                (else (mke-struct (cons nxt obj) prt))))
+        (cond ((end? end (car buff))
+               (vals obj (cdr buff)))
+              ((strt? strt (car buff))
+               (let (obj* buff) (mke-struct `(,ctor) prt (cdr buff))
+                    (mke-struct (cons (rev obj*) obj) prt buff)))
+              (else (mke-struct (cons (->dat (car buff)) obj)
+                                prt
+                                (cdr buff))))))
   (read-hash-extend chr
     (fn (chr prt)
-        `(,ctor ,@(parse prt)))))
+      (let (obj buff) (mke-struct `(,ctor) prt)
+           (if (nil? buff) (rev obj)
+               (error "reader broke, alpha software :("))))))
+
+(def strt? (strt obj) (and (str? obj) (string=? obj strt)))
+(def end?  (end obj)  (and (str? obj) (string=? obj end)))
 
 (def str-split (regx str)
   (let matchs (list-matches regx str)
     (w/ (strts (map match:start matchs)
          ends (map match:end matchs)
          idxs `(0 ,@(splice (zip strts ends)) ,(len str)))
-      ;; Use until
+      ;; TODO: use until
       (loop lp ((idxs (delete-duplicates idxs)))
         (if (< (_length idxs) 2) '()
             `(,(substring str (car idxs) (cadr idxs))
               ,@(lp (cdr idxs))))))))
 
 (def splice (lst)
-  (reduce join '() lst))
+  (reduce join '() (rev lst)))
 
 (def ->dat (str)
   (aif (str->num str) it (sym str)))
 
-
-;; TODO: allow nested vectors
-#;
-(read-hash-extend
- #\[
- (fn (chr prt)
-   (let end "]"
-     `(vector ,@(loop lp ((nxt (get-datum prt)))
-                  (if (symbol? nxt)
-                      (let matches (list-matches end (symbol->string nxt))
-                        (if (~(nil? matches))
-                            (let match (car matches)
-                              `(,@(let sub-str (substring
-                                                (match:string match) 0
-                                                (match:start match))
-                                    (if (string=? sub-str "") '()
-                                        (aif (string->number sub-str) `(,it)
-                                             `(,(string->symbol sub-str)))))))
-                            `(,nxt ,@(lp (read prt)))))
-                      `(,nxt ,@(lp (read prt)))))))))
-
-
-;; TODO: abstract
-#;
-(read-hash-extend
- #\{
- (fn (chr prt)
-   (let end "}"
-     `(tbl-init ,@(loop lp ((nxt (get-datum prt)))
-                    (if (symbol? nxt)
-                        (let matches (list-matches end (symbol->string nxt))
-                          (if (~(nil? matches))
-                              (let match (car matches)
-                                `(,@(let sub-str (substring
-                                                  (match:string match) 0
-                                                  (match:start match))
-                                      (if (string=? sub-str "") '()
-                                          (aif (string->number sub-str) `(,it)
-                                               `(,(string->symbol sub-str)))))))
-                              `(,nxt ,@(lp (read prt)))))
-                        `(,nxt ,@(lp (read prt)))))))))
+(xtnd-readr #\[ 'vector "[" "]")
+(xtnd-readr #\{ 'tbl-init "{" "}")
