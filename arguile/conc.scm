@@ -1,5 +1,5 @@
 (module (arguile conc)
-    #:export (futr doasync dosync ref @))
+    #:export (futr doasync dosync ref ref-val @))
 (use (arguile base)
      (arguile generic)
      (arguile guile)
