@@ -15,6 +15,7 @@
 
 (defp mke-vec (len #:o fill)
   (%mke-vec (make-vector len fill)))
+(defp vec args (lst->vec args))
 (defp vec: (v k) (v k))
 (defp vec! (v k obj) (v k obj))
 (defp vec-len (v) (vector-length (v)))
