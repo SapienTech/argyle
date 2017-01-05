@@ -4,6 +4,7 @@
      (arguile generic)
      (arguile guile)                    ; tmp
      (arguile data tbl)
+     (arguile data vec)
      (arguile conc)
      (ice-9 regex)
      (ice-9 match)                      ; tmp
@@ -12,9 +13,7 @@
 
 (read-disable 'square-brackets)
 
-;;; TODO: better names
-;;; TODO: allow vectors to be nested in maps & vis/versa
-(def xtnd-readr-wip (chr ctors #:o strts ends)
+(def xtnd-readr (chr ctors #:o strts ends)
   (def regx (apply join `("[" ,@ends ,@strts "]")))
   (def sym-buff (sym-exp) (str-split regx (str sym-exp)))
   (def mke-struct (#:o (strt "["))
@@ -69,8 +68,8 @@
   (if (nil? lst) (vals '() '()) 
       (vals (car lst) (cdr lst))))
 
-(xtnd-readr-wip #\[ '(vector tbl-init) '("[" "{") '("]" "}"))
-(xtnd-readr-wip #\{ '(vector tbl-init) '("[" "{") '("]" "}"))
+(xtnd-readr #\[ '(vec tbl-init) '("[" "{") '("]" "}"))
+(xtnd-readr #\{ '(vec tbl-init) '("[" "{") '("]" "}"))
 
 ;;; TODO: move to conc.scm?
 (read-hash-extend #\@
