@@ -8,38 +8,44 @@
      (ice-9 regex)
      (ice-9 match)                      ; tmp
      (rnrs io ports)
-     ((srfi srfi-1) #:select (reduce zip delete-duplicates drop)))
+     ((srfi srfi-1) #:select (take reduce zip delete-duplicates drop)))
 
 (read-disable 'square-brackets)
 
 ;;; TODO: better names
 ;;; TODO: allow vectors to be nested in maps & vis/versa
-(def xtnd-readr (chr ctor #:o strt end)
-  (def regx (join "[" end strt "]"))
-  (def mke-buff (sym-exp)
-    (str-split regx (str sym-exp)))
-  (def mke-struct (obj prt #:o (buff '()))
+(def xtnd-readr-wip (chr ctors #:o strts ends)
+  (def regx (apply join `("[" ,@ends ,@strts "]")))
+  (def sym-buff (sym-exp) (str-split regx (str sym-exp)))
+  (def mke-struct (#:o (strt "["))
+    `(,(list-ref ctors (lst-idx strts strt string=?))))        ; zero for now
+  (def parse (obj prt #:o (buff '()))
     (if (nil? buff)
         (let nxt (get-datum prt)
           (cond ((eof-object? nxt) obj)
-                ((sym? nxt) (mke-struct obj prt (mke-buff nxt)))
-                (else (mke-struct (cons nxt obj) prt))))
-        (cond ((end? end (car buff))
-               (vals obj (cdr buff)))
-              ((strt? strt (car buff))
-               (let (obj* buff) (mke-struct `(,ctor) prt (cdr buff))
-                    (mke-struct (cons (rev obj*) obj) prt buff)))
-              (else (mke-struct (cons (->dat (car buff)) obj)
-                                prt
-                                (cdr buff))))))
+                ((sym? nxt) (parse obj prt (sym-buff nxt)))
+                (else (parse (cons nxt obj) prt))))
+        (let (nxt rst) (snoc buff) 
+          (cond ((end? ends nxt) (vals obj rst))
+                ((strt? strts nxt)
+                 (let (obj* buff) (parse (mke-struct nxt) prt rst)
+                   (parse (cons (rev obj*) obj) prt buff)))
+                (else (parse (cons (->dat nxt) obj) prt rst))))))
   (read-hash-extend chr
     (fn (chr prt)
-      (let (obj buff) (mke-struct `(,ctor) prt)
-           (if (nil? buff) (rev obj)
-               (error "reader broke, alpha software :("))))))
+      (let (obj buff) (parse (mke-struct (str chr)) prt)
+        (if (nil? buff) (rev obj)
+            (error "reader broke, alpha software :("))))))
 
-(def strt? (strt obj) (and (str? obj) (string=? obj strt)))
-(def end?  (end obj)  (and (str? obj) (string=? obj end)))
+(def strt? (strts obj) (and (str? obj) (or-map (fn (strt) (string=? obj strt)) strts)))
+(def end? (ends obj) (and (str? obj) (or-map (fn (end) (string=? obj end)) ends)))
+
+;;; TODO: generalize aned add to lst.scm
+(def lst-idx (lst obj eq?)
+  (loop ((for obj* rst (in-list lst))
+         (where idx 0 (1+ idx))
+         (until (eq? obj* obj)))
+      => (if (nil? rst) #f idx)))
 
 (def str-split (regx str)
   (let matchs (list-matches regx str)
@@ -58,8 +64,13 @@
 (def ->dat (str)
   (aif (str->num str) it (sym str)))
 
-(xtnd-readr #\[ 'vector "[" "]")
-(xtnd-readr #\{ 'tbl-init "{" "}")
+;;; backwards cons :)
+(def snoc (lst)
+  (if (nil? lst) (vals '() '()) 
+      (vals (car lst) (cdr lst))))
+
+(xtnd-readr-wip #\[ '(vector tbl-init) '("[" "{") '("]" "}"))
+(xtnd-readr-wip #\{ '(vector tbl-init) '("[" "{") '("]" "}"))
 
 ;;; TODO: move to conc.scm?
 (read-hash-extend #\@
