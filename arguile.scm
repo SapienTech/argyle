@@ -3,6 +3,7 @@
      (arguile data)
      (arguile generic)
      (arguile loop)
+     (arguile conc)
      (arguile reader)
      
      (ice-9 match)
@@ -14,6 +15,7 @@
  (arguile data)
  (arguile generic)
  (arguile loop)
+ (arguile conc)
  
  (ice-9 match)
  (ice-9 receive)
