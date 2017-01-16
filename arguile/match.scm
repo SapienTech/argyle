@@ -5,8 +5,8 @@
      ((srfi srfi-1) :select (zip reduce append-map)))
 
 (mac mdef x
-  ((_ name (pat ...) . bdy)
-   (let-syn exps (gen-params #'(pat ...))
+  ((_ name (pat ... . rst) . bdy)
+   (let-syn exps #`(#,@(gen-params #'(pat ...)) . rst)
      #`(def name exps
          (match-xpnd #,(splice (zip #'(pat ...) #'exps)) . bdy)))))
 
