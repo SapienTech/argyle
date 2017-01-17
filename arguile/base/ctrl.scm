@@ -1,12 +1,11 @@
-(module (arguile base ctrl))
-
+(module (arguile base ctrl)
+    #:replace (do = aif it & $> nil?))
 (use ((srfi srfi-1) #:select (append-map lset-difference))
      (arguile guile)
      (arguile base mac)
      (arguile base fn)
      (ice-9 control))
 (re-export abort (call/cc . c/cc) (call/ec . c/ec))
-(export-syntax do = aif it & $>)
 
 (mac do ((_ e1 ...) #'(begin e1 ...)))
 
@@ -31,10 +30,10 @@
 (defp 0? zero?)
 (defp 1? (n) (=? 1 n))
 (defp ~ not)
-(defp nil? null?)
 (defp flatn append-map)
 (defp &map and-map)
 (defp set\ lset-difference)
+(def nil? null?)
 
 (mac $>
   ((_ exp)           #'(c/prmt (tag) (fn () exp) hdlr))

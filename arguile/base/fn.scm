@@ -1,6 +1,6 @@
 (module (arguile base fn)
-    #:export (comp id? defd? wrap))
-(export-syntax fn fn-case def defp let ret w/ \\ ->> inline)
+    #:replace (fn fn-case def defp let ret w/ \\ ->> inlite comp id? defd? wrap))
+;(export-syntax fn fn-case def defp let ret w/ \\ ->> inline)
 (use (arguile guile)
      (arguile base mac)
      (ice-9 receive))
@@ -44,7 +44,7 @@
 
 ;;; Replace w/ => when loop export is handled
 (mac ->>
-  ((_ fn ... exp) #'((compose fn ...) exp)))
+  ((_ exp fn ...) #'((compose fn ...) exp)))
 
 (mac inline
   ((_ name (arg ...) body ...)
@@ -55,4 +55,3 @@
   (def id? identifier?)
   (def defd? defined?)
   (def wrap const))
-
