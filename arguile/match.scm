@@ -1,27 +1,32 @@
 (module (arguile match))
+(export-syntax w/ let def)
 (use (arguile base)
+     ((arguile base fn)
+      #:select ((def . _def)
+                (let . _let)
+                (w/ . _w/)))
      (arguile loop)
      (arguile match compat)
      ((srfi srfi-1) :select (zip reduce append-map)))
 
-(mac mdef x
+(mac def
   ((_ name (pat ... . rst) . bdy)
    (let-syn exps #`(#,@(gen-params #'(pat ...)) . rst)
-     #`(def name exps
+     #`(_def name exps
          (match-xpnd #,(splice (zip #'(pat ...) #'exps)) . bdy)))))
 
-(mac mlet
-  ((_ pat exp . bdy) #'(mw/ (pat exp) . bdy)))
+(mac let
+  ((_ pat exp . bdy) #'(w/ (pat exp) . bdy)))
 
-(mac mw/
+(mac w/
   ((_ pat/exp . bdy) #'(match-xpnd pat/exp . bdy)))
 
 (mac if-match
   ((_ exp (pat bdy) . rst)
-   (let pat-ids (flatten (rec-filter sym? `(,(-> dat #'pat))))
+   (_let pat-ids (flatten (rec-filter sym? `(,(-> dat #'pat))))
      (let-syn pat-vars (map (fn (id) (-> syn id #'pat)) pat-ids)
        #`(if exp (match exp (pat bdy) . rst)
-             (w/ #,(splice (zip #'pat-vars (map (const #f) #'pat-vars)))
+             (_w/ #,(splice (zip #'pat-vars (map (const #f) #'pat-vars)))
                bdy))))))
 
 (mac match-xpnd
@@ -39,34 +44,34 @@
    #'(if-match exp (pat (op-match-xpnd rst . bdy)))))
 
 (eval-when (expand load eval)
-  (def gen-params (pats)
+  (_def gen-params (pats)
     (loop ((for pat (in-list pats))
            (where params '() (cons (if (keyword? (-> dat pat)) pat
                                        (-> syn (gensym) pat))
                                    params)))
         => (reverse params)))
   
-  (def flatten (lst)
+  (_def flatten (lst)
     (append-map (fn (elt)
                   (if (list? elt) (flatten elt)
                       `(,elt)))
                 lst))
   
-  (def rec-filter (pred lst)
+  (_def rec-filter (pred lst)
     (loop lp ((for elt (in-list lst)))
       => '()
       (cond ((list? elt)
-             (let filtered-elt (rec-filter pred elt)
+             (_let filtered-elt (rec-filter pred elt)
                (if (nil? filtered-elt) (lp)
                    (cons filtered-elt (lp)))))
             ((pred elt) (cons elt (lp)))
             (else (lp)))))
   
-  (def ids (pat)
+  (_def ids (pat)
     (flatten
      (loop lp ((for pat (in-list pat)))
        (cond ((identifier? pat) (list pat))
              ((list? pat) (ids pat)))
        pat)))
-  (def splice (lst)                     ;TODO: use general ver.
+  (_def splice (lst)                     ;TODO: use general ver.
     (reduce append '() (reverse lst))))

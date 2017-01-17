@@ -1,8 +1,11 @@
-(module (arguile))
+(module (arguile)
+  #:duplicates (last))
 (use (arguile base)
+     (arguile match)
      (arguile data)
      (arguile generic)
      (arguile loop)
+     (arguile nested-loop)
      (arguile conc)
      (arguile reader)
      
@@ -12,9 +15,11 @@
 
 (re-export-modules
  (arguile base)
+ (arguile match)
  (arguile data)
  (arguile generic)
  (arguile loop)
+ (arguile nested-loop)
  (arguile conc)
  
  (ice-9 match)
