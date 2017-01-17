@@ -44,12 +44,15 @@
    #'(if-match exp (pat (op-match-xpnd rst . bdy)))))
 
 (eval-when (expand load eval)
+
   (_def gen-params (pats)
-    (loop ((for pat (in-list pats))
-           (where params '() (cons (if (keyword? (-> dat pat)) pat
-                                       (-> syn (gensym) pat))
-                                   params)))
-        => (reverse params)))
+    (match (dat pats)
+      (() pats)
+      ((pat #:as var . rst)
+       (cons (caddr pats) (gen-params (cdddr pats))))
+      ((#:o . rst)
+       (cons (car pats) (gen-params (cdr pats))))
+      (else (cons (syn (gensym) (car pats)) (gen-params (cdr pats))))))
   
   (_def flatten (lst)
     (append-map (fn (elt)
