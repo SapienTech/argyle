@@ -1,5 +1,5 @@
 (module (arguile data tbl)
-  #:export (tbl tbl? tbl-t tbl-t! tbl-fn tbl-fn!))
+  #:export (<tbl> tbl tbl? tbl-t tbl-t! tbl-fn tbl-fn!))
 (use (arguile base)
      ((arguile guile) :select (grp))
      (arguile data))
@@ -36,4 +36,3 @@
 (defp tbl-fold (f init t) (hash-fold fun init (t)))
 (defp tbl-each (f t) (hash-for-each fun (t)))
 (defp tbl-map->lst (f t) (hash-map->list f (t)))
-
