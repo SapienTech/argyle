@@ -5,15 +5,18 @@
       #:select ((def . _def)
                 (let . _let)
                 (w/ . _w/)))
+     ((arguile data tbl) #:select (<tbl>))
      (arguile loop)
      (arguile match compat)
      ((srfi srfi-1) :select (zip reduce append-map)))
 
 (mac def
-  ((_ name (pat ... . rst) . bdy)
+  ((_ name exp)
+   #'(_def name exp))
+  ((_ name (pat ... . rst) b1 b2 ...)
    (let-syn exps #`(#,@(gen-params #'(pat ...)) . rst)
      #`(_def name exps
-         (match-xpnd #,(splice (zip #'(pat ...) #'exps)) . bdy)))))
+         (match-xpnd #,(splice (zip #'(pat ...) #'exps)) b1 b2 ...)))))
 
 (mac let
   ((_ pat exp . bdy) #'(w/ (pat exp) . bdy)))
@@ -29,9 +32,26 @@
              (_w/ #,(splice (zip #'pat-vars (map (const #f) #'pat-vars)))
                bdy))))))
 
+(mac tbl-match
+  ((_ tbl ((#:keys key ...) . bdy))
+   #`(match tbl (($ <tbl>)
+                 (w/keys (key ...) tbl
+                         #,@#'bdy)))))
+
+(mac w/keys
+  ((_ (key ...) tbl bdy)
+   #`(w/ #,(splice
+            (map (fn (key)
+                   #`(#,key (tbl '#,key)))
+                 #'(key ...)))
+       bdy)))
+
 (mac match-xpnd
   ((_ () . bdy)
    #'(do . bdy))
+  ((_ ((#:keys key ...) tbl . rst) . bdy)
+   #'(tbl-match tbl ((#:keys key ...)
+                     (match-xpnd rst . bdy))))
   ((_ (kwd _ . rst) . bdy) (keyword? (-> dat #'kwd))
    #'(op-match-xpnd rst . bdy))
   ((_ (pat exp . rst) . bdy)
