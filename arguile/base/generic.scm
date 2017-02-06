@@ -6,6 +6,7 @@
 
 (def + args
   (cond ((null? args) 0)
+        ((num? (car args)) (apply _+ args))
         ((one-of `(,str? ,chr?) (car args))
          (apply str-join (map (\\ -> str _) args)))
         ((sym? (car args))
@@ -15,6 +16,7 @@
 ;;; TODO: Add cartesian product for data
 (def * args
   (cond ((null? args) 0)
+        ((num? (car args)) (apply _* args))
         ((one-of `(,str? ,chr?) (car args))
          (apply str-join
                 (map (fn (val) (-> str (car args)))
