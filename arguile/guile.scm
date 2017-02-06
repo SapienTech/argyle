@@ -55,5 +55,6 @@
         => (reverse args*)))
 
 (define (has-kwargs? args)
-  (or-map (lambda (arg) (keyword? (syntax->datum arg)))
+  (or-map (lambda (arg)
+            (keyword? (syntax->datum arg)))
           args))

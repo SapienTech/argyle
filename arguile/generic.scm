@@ -1,8 +1,12 @@
 (module (arguile generic)
-    #:export (gen gen-fn? xtnd type
-              len rev join cpy clr! map))
+  #:replace (map)
+  #:export (gen gen-fn? xtnd type
+                len rev join cpy clr!))
 (use (arguile base)
      (arguile data)
+     (arguile data tbl)
+     (arguile data vec)
+     (arguile data q)
      (arguile guile)
      (arguile loop)
      ((srfi srfi-1) #:select (unzip2)))

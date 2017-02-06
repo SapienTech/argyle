@@ -1,5 +1,6 @@
 (module (arguile conc)
-    #:export (futr futr? mke-futr <ref> ref ref? @ doasync dosync alter))
+  #:replace (@)
+  #:export (futr futr? mke-futr <ref> ref ref? doasync dosync alter))
 (use (arguile base)
      (arguile generic)
      (arguile guile)
