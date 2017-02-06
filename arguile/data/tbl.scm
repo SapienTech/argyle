@@ -15,7 +15,7 @@
 ;;; Consider using w/tbl as dflt ctor
 (defp mke-tbl (#:o (n 0))
   (%mke-tbl (make-hash-table n)))
-(defp tbl-init args
+(defp tbl args
   (ret tbl (mke-tbl)
        (for-each (\\ apply tbl _) (grp args 2))))
 (defp tbl: (t k) (t k))

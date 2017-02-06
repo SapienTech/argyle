@@ -14,7 +14,7 @@
 (read-disable 'square-brackets)
 
 (def xtnd-readr (chr ctors #:o strts ends)
-  (def regx (apply join `("[" ,@ends ,@strts "]")))
+  (def regx (apply string-append `("[" ,@ends ,@strts "]")))
   (def sym-buff (sym-exp) (str-split regx (str sym-exp)))
   (def mke-struct (#:o (strt "["))
     `(,(list-ref ctors (lst-idx strts strt string=?))))        ; zero for now
@@ -68,8 +68,8 @@
   (if (nil? lst) (vals '() '()) 
       (vals (car lst) (cdr lst))))
 
-(xtnd-readr #\[ '(vec tbl-init) '("[" "{") '("]" "}"))
-(xtnd-readr #\{ '(vec tbl-init) '("[" "{") '("]" "}"))
+(xtnd-readr #\[ '(vec tbl) '("[" "{") '("]" "}"))
+(xtnd-readr #\{ '(vec tbl) '("[" "{") '("]" "}"))
 
 ;;; TODO: move to conc.scm?
 (read-hash-extend #\@
