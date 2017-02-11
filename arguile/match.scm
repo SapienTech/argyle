@@ -24,20 +24,23 @@
 (mac w/
   ((_ pat/exp . bdy) #'(match-xpnd pat/exp . bdy)))
 
-(mac if-match
-  ((_ exp (pat bdy) . rst)
-   (_let pat-ids (flatten (rec-filter sym? `(,(-> dat #'pat))))
-     (let-syn pat-vars (map (fn (id) (-> syn id #'pat)) pat-ids)
-       #`(if exp (match exp (pat bdy) . rst)
-             (_w/ #,(splice (zip #'pat-vars (map (const #f) #'pat-vars)))
-               bdy))))))
+(mac if-match (:or)
+     ((_ exp ((pat :or val) bdy) . rst)
+      (_let pat-ids (flatten (rec-filter sym? `(,(-> dat #'pat))))
+        (let-syn pat-vars (map (fn (id) (-> syn id #'pat)) pat-ids)
+          #`(if exp (match exp (pat bdy) . rst)
+                (_w/ #,(splice (zip #'pat-vars (map (const #f) #'pat-vars)))
+                     bdy)))))
+     ((_ exp (pat bdy) rst ...)
+      #'(if-match exp ((pat :or #f) bdy) rst ...)))
 
-(mac tbl-match
-  ((_ tbl ((#:keys key ...) . bdy))
+(mac tbl-match (:keys)
+  ((_ tbl ((:keys key ...) . bdy))
    #`(match tbl (($ <tbl>)
                  (w/keys (key ...) tbl
                          #,@#'bdy)))))
 
+;;; TODO: determine if we want :keys or 'keys
 (mac w/keys
   ((_ (key ...) tbl bdy)
    #`(w/ #,(splice
@@ -46,13 +49,13 @@
                  #'(key ...)))
        bdy)))
 
-(mac match-xpnd
+(mac match-xpnd (:keys)
   ((_ () . bdy)
    #'(do . bdy))
-  ((_ ((#:keys key ...) tbl . rst) . bdy)
-   #'(tbl-match tbl ((#:keys key ...)
+  ((_ ((:keys key ...) tbl . rst) . bdy)
+   #'(tbl-match tbl ((:keys key ...)
                      (match-xpnd rst . bdy))))
-  ((_ (kwd _ . rst) . bdy) (keyword? (-> dat #'kwd))
+  ((_ (_ kwd . rst) . bdy) (keyword? (-> dat #'kwd))
    #'(op-match-xpnd rst . bdy))
   ((_ (pat exp . rst) . bdy)
    #'(match exp (pat (match-xpnd rst . bdy)))))
@@ -61,40 +64,46 @@
   ((_ () . bdy)
    #'(do . bdy))
   ((_ (pat exp . rst) . bdy)
-   #'(if-match exp (pat (op-match-xpnd rst . bdy)))))
+   (do  (prn (dat #'pat) (dat #'exp))
+       #'(if-match exp (pat (op-match-xpnd rst . bdy))))))
 
+;;; TODO: determine if these can be namespaced with base/def
 (eval-when (expand load eval)
 
   (_def gen-params (pats)
-    (match (dat pats)
-      (() pats)
-      ((pat #:as var . rst)
-       (cons (caddr pats) (gen-params (cdddr pats))))
-      ((#:o . rst)
-       (cons (car pats) (gen-params (cdr pats))))
-      (else (cons (syn (gensym) (car pats)) (gen-params (cdr pats))))))
+    (if (nil? pats) pats
+        (syn-case pats (:o)
+          ((:o . rst)
+           #`(#:o #,@(gen-params #'rst)))
+          ((pat . rst) #`(#,(syn (gensym) #'pat)
+                          #,@(gen-params #'rst))))))
   
+  (_def parse-req-pat (pat)
+    (syn-case pat ()
+      ((pat #:as var) #'var)
+      ((_) (syn (gensym) #'pat))))
+
   (_def flatten (lst)
-    (append-map (fn (elt)
-                  (if (list? elt) (flatten elt)
-                      `(,elt)))
-                lst))
+        (append-map (fn (elt)
+                      (if (list? elt) (flatten elt)
+                          `(,elt)))
+                    lst))
   
   (_def rec-filter (pred lst)
-    (loop lp ((for elt (in-list lst)))
-      => '()
-      (cond ((list? elt)
-             (_let filtered-elt (rec-filter pred elt)
-               (if (nil? filtered-elt) (lp)
-                   (cons filtered-elt (lp)))))
-            ((pred elt) (cons elt (lp)))
-            (else (lp)))))
+        (loop lp ((for elt (in-list lst)))
+          => '()
+          (cond ((list? elt)
+                 (_let filtered-elt (rec-filter pred elt)
+                       (if (nil? filtered-elt) (lp)
+                           (cons filtered-elt (lp)))))
+                ((pred elt) (cons elt (lp)))
+                (else (lp)))))
   
   (_def ids (pat)
-    (flatten
-     (loop lp ((for pat (in-list pat)))
-       (cond ((identifier? pat) (list pat))
-             ((list? pat) (ids pat)))
-       pat)))
-  (_def splice (lst)                     ;TODO: use general ver.
-    (reduce append '() (reverse lst))))
+        (flatten
+         (loop lp ((for pat (in-list pat)))
+           (cond ((identifier? pat) (list pat))
+                 ((list? pat) (ids pat)))
+           pat)))
+  (_def splice (lst)              ;TODO: use general ver.
+        (reduce append '() (reverse lst))))
