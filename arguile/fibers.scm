@@ -4,7 +4,7 @@
      (arguile base))
 
 (mac go
-  ((_ exp ...)
+  ((exp ...)
    #`(run-fibers
       (fn ()
         #,@(map (fn (e)

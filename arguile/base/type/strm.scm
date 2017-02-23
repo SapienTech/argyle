@@ -30,17 +30,17 @@
 (defp strm-zip stream-zip)
 
 (mac scons
-  ((_ obj strm) #'(stream-cons obj strm)))
+  ((obj strm) #'(stream-cons obj strm)))
 (mac sfn
-  ((_ args e1 e2 ...) #'(stream-lambda args e1 e2 ...)))
+  ((args e1 e2 ...) #'(stream-lambda args e1 e2 ...)))
 
 (mac slet
-  ((_ tag ((name val) ...) e1 e2 ...)
+  ((tag ((name val) ...) e1 e2 ...)
    #'(stream-let ((name val) ...) e1 e2 ...)))
 
 (mac strm-match
-  ((_ strm-exp (pat . exp) ...)
+  ((strm-exp (pat . exp) ...)
    #'(stream-match strm-map (pat . exp) ...)))
 
 (mac strm-of
-  ((_ exp rst ...) #'(stream-of exr rst ...)))
+  ((exp rst ...) #'(stream-of exr rst ...)))

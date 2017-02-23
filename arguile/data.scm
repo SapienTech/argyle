@@ -5,38 +5,45 @@
      (arguile data immutable)
      ((srfi srfi-1) #:select (first)))
 
-;;; TODO: add #:init to field specs
-;;;       order fields in printer
-(mac data x
-  ((_ name (field ...)
-      #:init (mke arg ...)
-      spec ...
-      #:app fn)
-   (%data x #t #'(_ name (field ...) #:init (mke arg ...) spec ... #:app fn)))
-  ((_ name (field ...) spec ... #:app fn)
-   (%data x #t #`(_ name (field ...) #:init (#,(std-mke #'name x) field ...)
-                   spec ... #:app fn)))
-  ((_ name (field ...) #:init (mke arg ...) spec ...)
-   (%data x #t #`(_ name (field ...) #:init (mke arg ...) spec ... #:app (not-app 'name))))
-  ((_ name (field ...) spec ...)
-   (%data x #t #`(_ name (field ...) #:init (#,(std-mke #'name x) field ...)
-                  spec ... #:app (not-app 'name)))))
+(mac data (patt #'(%data #t patt)))
+(mac trans (patt #'(%data #f patt)))
 
-;;; TODO: copying for now
-(mac trans x
-  ((_ name (field ...)
-      #:init (mke arg ...)
-      spec ...
-      #:app fn)
-   (%data x #f #'(_ name (field ...) #:init (mke arg ...) spec ... #:app fn)))
-  ((_ name (field ...) spec ... #:app fn)
-   (%data x #f #`(_ name (field ...) #:init (#,(std-mke #'name x) field ...)
-                   spec ... #:app fn)))
-  ((_ name (field ...) #:init (mke arg ...) spec ...)
-   (%data x #f #`(_ name (field ...) #:init (mke arg ...) spec ... #:app (not-app 'name))))
-  ((_ name (field ...) spec ...)
-   (%data x #f #`(_ name (field ...) #:init (#,(std-mke #'name x) field ...)
-                  spec ... #:app (not-app 'name)))))
+(mac %data x
+  ((imm? (name (field ...)
+              #:init (mke arg ...)
+              spec ...
+              #:app fn))
+   #`(%%data imm? (name (field ...) #:init (mke arg ...) spec ... #:app fn)))
+  ((imm? (name (field ...) spec ... #:app fn))
+   #`(%data imm? (name (field ...) #:init (#,(std-mke #'name x) field ...)
+                       spec ... #:app fn)))
+  ((imm? (name (field ...) #:init (mke arg ...) spec ...))
+   #`(%data imm? (name (field ...) #:init (mke arg ...) spec ... #:app (not-app 'name))))
+  ((imm? (name (field ...) spec ...))
+   #`(%data imm? (name (field ...) #:init (#,(std-mke #'name x) field ...)
+                       spec ... #:app (not-app 'name)))))
+
+(mac %%data
+  ((imm? (name (field ...)
+               #:init (mke arg ...) spec ...
+               #:app fn))
+   (let name' (dat #'name)
+     (w/syn (type (syn (+ '< name' '>) #'name)
+             %mke (syn (+ '% (dat #'mke)) #'name)
+             pred (syn (+ name' '?) #'name)
+             (app app: app!) (mke-app-spec name' #'name)
+             self (syn 'self #'name))
+       #`(do (#,(if (dat #'imm?) #'define-immutable-record-type
+                  #'define-record-type)
+              type
+              (%mke arg ...) pred
+              (app app: app!)
+              #,@(mke-field-specs name' #'(field ...) #'(spec ...) #'name)
+              spec ...)
+             (def mke args 
+               (#,(if (dat #'imm?) #'let #'ret)
+                self (apply %mke args) (app! self fn))))))))
+
 
 (def data-type? record-type?)
 (def data? record?)
@@ -45,39 +52,19 @@
 
 (eval-when (expand load eval)
 
-  (def %data (ctx imm? syn-exp)
-    (syn-case syn-exp ()
-     ((_ name (field ...) #:init (mke arg ...) spec ... #:app fn)
-      (let name' (dat #'name)
-        (w/syn (type (syn (+ '< name' '>) ctx)
-                %mke (syn (+ '% (dat #'mke)) ctx)
-                pred (syn (+ name' '?) ctx)
-                (app app: app!) (mke-app-spec name' ctx)
-                self (syn 'self ctx))
-          #`(do (#,(if imm? #'define-immutable-record-type
-                       #'define-record-type)
-                 type
-                 (%mke arg ...) pred
-                 (app app: app!)
-                 #,@(mke-field-specs name' #'(field ...) #'(spec ...) ctx)
-                 spec ...)
-           (def mke args 
-             (#,(if imm? #'let #'ret)
-              self (apply %mke args) (app! self fn)))))))))
-
-  (def std-mke (name ctx) (syn (dat name) ctx))
-
-  (def mke-app-spec (name ctx)
-    (-> syn (mke-field-spec name 'fn) ctx))
-
-  (def mke-field-spec (name field)
-    `(,field ,@(map (\\ + name '- field _)
-                    `(,(symbol) !))))
-
-  (def mke-field-specs (name fields specs ctx)
-    (-> syn (map (\\ mke-field-spec name _)
-                 (set\ eq? (-> dat fields)
-                          (map first (-> dat specs)))) ctx))
-  (def not-app (name)
-    (fn args (err "Wrong type to apply:" name
-                  "data-type not applicable"))))
+ (def std-mke (name ctx) (syn (dat name) ctx))
+ 
+ (def mke-app-spec (name ctx)
+   (syn (mke-field-spec name 'fn) ctx))
+ 
+ (def mke-field-spec (name field)
+   `(,field ,@(map (\\ + name '- field _)
+                   `(,(symbol) !))))
+ 
+ (def mke-field-specs (name fields specs ctx)
+   (syn (map (\\ mke-field-spec name _)
+             (set\ eq? (-> dat fields)
+                       (map first (-> dat specs)))) ctx))
+ (def not-app (name)
+   (fn args (err "Wrong type to apply:" name
+                 "data-type not applicable"))))

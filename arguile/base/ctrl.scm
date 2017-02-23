@@ -7,20 +7,20 @@
      (ice-9 control))
 (re-export abort (call/cc . c/cc) (call/ec . c/ec))
 
-(mac do ((_ e1 ...) #'(begin e1 ...)))
+(mac do ((e1 ...) #'(begin e1 ...)))
 
 ;;; TODO: check if var is a free variable, and if so, define it
 (mac =
-  ((_ var val) #'(set! var val))
-  ((_ var val rest ...) #'(do (set! var val) (= rest ...))))
+  ((var val) #'(set! var val))
+  ((var val rest ...) #'(do (set! var val) (= rest ...))))
 
 
 (mac aif x
-  ((_ test then else)
+  ((test then else)
    (let-syn it (datum->syntax x 'it)
      #'(let it test (if it then else)))))
 
-(mac & ((_ e1 ...) #'(and e1 ...)))
+(mac & ((e1 ...) #'(and e1 ...)))
 
 (defp c/prmt call-with-prompt)
 (defp c/vals call-with-values)
@@ -36,9 +36,9 @@
 (def nil? null?)
 
 (mac $>
-  ((_ exp)           #'(c/prmt (tag) (fn () exp) hdlr))
-  ((_ exp hdlr)      #'(c/prmt (tag) (fn () exp) hdlr))
-  ((_ tag expr hdlr) #'(c/prmt (tag) (fn () exp) hdlr)))
+  ((exp)           #'(c/prmt (tag) (fn () exp) hdlr))
+  ((exp hdlr)      #'(c/prmt (tag) (fn () exp) hdlr))
+  ((tag expr hdlr) #'(c/prmt (tag) (fn () exp) hdlr)))
 
 (def hdlr (cont f)
   ($> (tag) (f cont) hdlr))

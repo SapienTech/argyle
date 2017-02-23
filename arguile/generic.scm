@@ -12,7 +12,7 @@
      ((srfi srfi-1) #:select (unzip2)))
 
 (mac gen
-  ((_ name) (id? #'name)
+  ((name) (id? #'name)
    #`(def name (%gen-fn 'name (ret t (mke-tbl)
                                 #,(when (defd? (-> dat #'name))
                                   #'(t 'def name)))))))
@@ -45,14 +45,14 @@
 (mac xtnd x
   (def split (lst)
     (c/vals (fn () (unzip2 (grp lst 2))) list))
-  ((_ name (arg1 ... . rest) body ...) (~(nil? #'rest))
+  ((name (arg1 ... . rest) body ...) (~(nil? #'rest))
    (let-syn (args types) (split #'(arg1 ...))
      #`(loop ((for type  (in-list 'types))
               (where tbl (gen-fn-tbl name)
                 (if (tbl type) (tbl type)
                      (tbl type (mke-tbl)))))
         => (tbl 'rst (fn (#,@#'args . rest) body ...)))))
-  ((_ name (arg1 ...) body ...) (defd? (-> dat #'name))
+  ((name (arg1 ...) body ...) (defd? (-> dat #'name))
    (let-syn (args types) (split #'(arg1 ...))
             ;; TODO: refactor
      #`(loop ((for type  (in-list 'types))

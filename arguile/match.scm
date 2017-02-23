@@ -11,38 +11,38 @@
      ((srfi srfi-1) :select (zip reduce append-map)))
 
 (mac def
-  ((_ name exp)
+  ((name exp)
    #'(_def name exp))
-  ((_ name (pat ... . rst) b1 b2 ...)
+  ((name (pat ... . rst) b1 b2 ...)
    (let-syn exps #`(#,@(gen-params #'(pat ...)) . rst)
      #`(_def name exps
          (match-xpnd #,(splice (zip #'(pat ...) #'exps)) b1 b2 ...)))))
 
 (mac let
-  ((_ pat exp . bdy) #'(w/ (pat exp) . bdy)))
+  ((pat exp . bdy) #'(w/ (pat exp) . bdy)))
 
 (mac w/
-  ((_ pat/exp . bdy) #'(match-xpnd pat/exp . bdy)))
+  ((pat/exp . bdy) #'(match-xpnd pat/exp . bdy)))
 
 (mac if-match (:or)
-     ((_ exp ((pat :or val) bdy) . rst)
+     ((exp ((pat :or val) bdy) . rst)
       (_let pat-ids (flatten (rec-filter sym? `(,(-> dat #'pat))))
         (let-syn pat-vars (map (fn (id) (-> syn id #'pat)) pat-ids)
           #`(if exp (match exp (pat bdy) . rst)
                 (_w/ #,(splice (zip #'pat-vars (map (const #f) #'pat-vars)))
                      bdy)))))
-     ((_ exp (pat bdy) rst ...)
+     ((exp (pat bdy) rst ...)
       #'(if-match exp ((pat :or #f) bdy) rst ...)))
 
 (mac tbl-match (:keys)
-  ((_ tbl ((:keys key ...) . bdy))
+  ((tbl ((:keys key ...) . bdy))
    #`(match tbl (($ <tbl>)
                  (w/keys (key ...) tbl
                          #,@#'bdy)))))
 
 ;;; TODO: determine if we want :keys or 'keys
 (mac w/keys
-  ((_ (key ...) tbl bdy)
+  (((key ...) tbl bdy)
    #`(w/ #,(splice
             (map (fn (key)
                    #`(#,key (tbl '#,key)))
@@ -50,20 +50,20 @@
        bdy)))
 
 (mac match-xpnd (:keys)
-  ((_ () . bdy)
+  ((() . bdy)
    #'(do . bdy))
-  ((_ ((:keys key ...) tbl . rst) . bdy)
+  ((((:keys key ...) tbl . rst) . bdy)
    #'(tbl-match tbl ((:keys key ...)
                      (match-xpnd rst . bdy))))
-  ((_ (_ kwd . rst) . bdy) (keyword? (-> dat #'kwd))
+  (((kwd . rst) . bdy) (keyword? (-> dat #'kwd))
    #'(op-match-xpnd rst . bdy))
-  ((_ (pat exp . rst) . bdy)
+  (((pat exp . rst) . bdy)
    #'(match exp (pat (match-xpnd rst . bdy)))))
 
 (mac op-match-xpnd
-  ((_ () . bdy)
+  ((() . bdy)
    #'(do . bdy))
-  ((_ (pat exp . rst) . bdy)
+  (((pat exp . rst) . bdy)
    (do  (prn (dat #'pat) (dat #'exp))
        #'(if-match exp (pat (op-match-xpnd rst . bdy))))))
 

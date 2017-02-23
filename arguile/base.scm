@@ -1,5 +1,4 @@
 (module (arguile base))
-
 (use (arguile base mac)
      (arguile base fn)
      (arguile base ctrl)

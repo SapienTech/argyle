@@ -6,7 +6,7 @@
 
 
 (mac re-export-modules x
-  ((_ m ...)
+  ((m ...)
    #`(re-export 
       #,@(datum->syntax x
            (append-map

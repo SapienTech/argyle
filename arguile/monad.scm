@@ -22,7 +22,7 @@
       #:init (mke-monad bind return))      ; TODO: Add 'plus' and 'zero'
 
 (mac monad (bind return)
-  ((_ name (bind b) (return r))
+  ((name (bind b) (return r))
    (let-syn data (syn (+ '% (dat #'name)) #'name)
      #'(do
            ;; The data type, for use at run time.
@@ -30,8 +30,8 @@
          (mac name (%bind %return)
               ;; An "inlined record", for use at expansion time. The goal is
               ;; to allow 'bind' and 'return' to be resolved at expansion time
-               ((_ %bind)   #'b)
-               ((_ %return) #'r)
+               ((%bind)   #'b)
+               ((%return) #'r)
                ((_)         #'rtd))))))
 
 (syn-param >>=
@@ -53,11 +53,11 @@ though BIND is simply binary, as in:
     (>>= (return 1)
          (lift 1+ state-monad)
          (lift 1+ state-monad))) "
-  ((_ bind)
+  ((bind)
    #'(fn (stx)
        (def (expand body)
            (syntax-case body ()
-             ((_ mval mproc)
+             ((mval mproc)
               #'(bind mval mproc))
              ((x mval mproc0 mprocs (... ...))
               (expand #'(>>= (>>= mval mproc0)
@@ -67,7 +67,7 @@ though BIND is simply binary, as in:
 
 (mac w/monad
   "Evaluate BODY in the context of MONAD, and return its result."
-  ((_ monad body ...)
+  ((monad body ...)
    (if (eq? 'macro (syntax-local-binding #'monad))
        ;; Expansion time
        #'(w/syn-params ((>>= (bind-syn (monad %bind)))
@@ -84,21 +84,21 @@ though BIND is simply binary, as in:
   "Bind the given monadic vals MVAL to the given variables VAR.  When the
 form is (VAR -> VAL), bind VAR to the non-monadic value VAL in the same way as
 'let'."
-  ((_ monad () body ...)
+  ((monad () body ...)
    #'(w/monad monad body ...))
-  ((_ monad ((var mval) rest ...) body ...)
+  ((monad ((var mval) rest ...) body ...)
    #'(w/monad monad
        (>>= mval
             (fn (var)
               (mlet* monad (rest ...)
                 body ...)))))
-  ((_ monad ((var -> val) rest ...) body ...)
+  ((monad ((var -> val) rest ...) body ...)
    #'(let var val
        (mlet* monad (rest ...)
          body ...))))
 
 (mac mlet
-  ((_ monad ((var mval ...) ...) body ...)
+  ((monad ((var mval ...) ...) body ...)
    (let-syn (temp ...) (gen-tmps #'(var ...))
      #'(mlet* monad ((temp mval ...) ...)
          (_let ((var temp) ...)
@@ -107,14 +107,14 @@ form is (VAR -> VAL), bind VAR to the non-monadic value VAL in the same way as
 (mac mdo 
   "Bind the given monadic expressions in seq, returning the result of
 the last one."
-  ((_ %curr-monad mexp) #'mexp)
-  ((_ %curr-monad mexp rest ...)
+  ((%curr-monad mexp) #'mexp)
+  ((%curr-monad mexp rest ...)
    #'(>>= mexp
           (fn (unused-value)
             (mdo %curr-monad rest ...))))
-  ((_ monad mexp)
+  ((monad mexp)
    #'(w/monad monad mexp))
-  ((_ monad mexp rest ...)
+  ((monad mexp rest ...)
    #'(w/monad monad
        (>>= mexp
             (fn (unused-value)
@@ -123,7 +123,7 @@ the last one."
 (mac mwhen
   "When CONDITION is true, evaluate EXP0..EXP* as in an 'mdo'.  When
 CONDITION is false, return *unspecified* in the curr monad."
-  ((_ condition exp0 exp* ...)
+  ((condition exp0 exp* ...)
    #'(if condition
          (mdo %curr-monad
            exp0 exp* ...)
@@ -132,14 +132,14 @@ CONDITION is false, return *unspecified* in the curr monad."
 (mac munless
   "When CONDITION is false, evaluate EXP0..EXP* as in an 'mdo'.  When
   CONDITION is true, return *unspecified* in the curr monad."
-  ((_ condition exp0 exp* ...)
+  ((condition exp0 exp* ...)
    #'(if condition
          (return *unspecified*)
          (mdo %curr-monad
            exp0 exp* ...))))
 
 (mac def-lift
-  ((_ liftn (args ...))
+  ((liftn (args ...))
    #'(mac liftn
        "Lift PROC to MONAD---i.e., return a monadic function in MONAD."
        ((liftn proc monad)
@@ -211,7 +211,7 @@ MONAD---i.e., return a monadic function in MONAD."
 (mac seq
   "Turn the list of monadic vals LST into a monadic list of vals, by
 evaluating each item of LST in seq."
-  ((_ monad lst)
+  ((monad lst)
    #'(w/monad monad
        (loop seq ((lstx   lst)
                   (result '()))
@@ -244,7 +244,7 @@ value for which MPROC returns a true monadic value or #f.  For example:
 
 (mac listm
   "Return a monadic list in MONAD from the monadic vals MVAL."
-  ((_ monad mval ...)
+  ((monad mval ...)
    (let-syn (val ...) (gen-tmps #'(mval ...))
      #'(mlet monad ((val mval) ...)
          (return (list val ...))))))

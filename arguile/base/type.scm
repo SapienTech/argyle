@@ -44,7 +44,7 @@
           (apply converter (cons x args))))))
 
 ;;; Deprecated: use base type constructors, or data converter
-(mac -> ((_ type obj . args) #'(coerce obj 'type . args)))
+(mac -> ((type obj . args) #'(coerce obj 'type . args)))
 
 (def coercions
   (ret coercions (make-hash-table)
@@ -92,7 +92,7 @@
 (def iround (compose inexact->exact round))
 
 (mac export-type-ctrs
-  ((_ t1 ...)
+  ((t1 ...)
    #`(do #,@(map (fn (t)
                    #`(defp #,t (obj . args)
                        (apply coerce obj '#,t args)))

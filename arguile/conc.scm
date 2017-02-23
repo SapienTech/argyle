@@ -11,7 +11,7 @@
      (ice-9 threads))
 
 (mac futr
-  ((_ exp) #'(future exp)))
+  ((exp) #'(future exp)))
 
 (defp futr? future?)
 (defp mke-futr make-future)
@@ -27,10 +27,10 @@
           (else (err "attempt to deref a non-lazy obj" lzy-obj))))
 
 (mac doasync
-  ((_ e0 ...) #'(parallel e0 ...)))
+  ((e0 ...) #'(parallel e0 ...)))
 
 (mac dosync x
-  ((_ (refs ...) body ...) 
+  (((refs ...) body ...) 
    (let ref-dats (map (fn (ref) (syn->dat ref)) #'(refs ...))
      (w/syn ((ref-cpys ...) (map (fn (ref) (datum->syntax x ref)) ref-dats)
              alter (syn 'alter x))
@@ -44,25 +44,25 @@
 
 ;;; TODO: only allow user to use alter in a dosync block
 (mac alter
-  ((_ ref val) 
+  ((ref val) 
    #'(with-mutex (ref-mutx ref)
        (set! ref (ref-val! ref val)))))
 
 (mac set-refs!
-  ((_ (refs ...) vals)
+  (((refs ...) vals)
    #`(do #,@(map (fn (ref val) #`(set! #,ref (ref-val! #,ref (ref-val #,val))))
                  #'(refs ...)
                  #`(#,@(map (fn (i) #`(list-ref vals #,i))
                             (iota (_length #'(refs ...)))))))))
 
 (mac w/refs
-  ((_ (r1 ...) e1 ...)
+  (((r1 ...) e1 ...)
    #`(w/mutxs #,(map (fn (ref) #`(ref-mutx #,ref))
                      #'(r1 ...))
               e1 ...)))
 
 (mac w/mutxs
-  ((_ (m1 ...) e1 ...)
+  (((m1 ...) e1 ...)
    #`(#,@(loop lp ((ms #'(m1 ...)))
            (if (nil? ms) #'(do e1 ...)
                #`(with-mutex #,(car ms)
