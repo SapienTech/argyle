@@ -15,6 +15,7 @@
    #'(_def name exp))
   ((name (pat ... . rst) b1 b2 ...)
    (let-syn pat:exps #`(#,@(parse-params #'(pat ...)) . rst)
+     (prn (dat #'pat:exps))
      #`(_def name #,(map cadr #'pat:exps)
          (match-xpnd #,(splice #'pat:exps) b1 b2 ...)))))
 
@@ -55,7 +56,7 @@
   ((((:keys key ...) tbl . rst) . bdy)
    #'(tbl-match tbl ((:keys key ...)
                      (match-xpnd rst . bdy))))
-  (((kwd . rst) . bdy) (keyword? (-> dat #'kwd))
+  (((kwd kwd' . rst) . bdy) (keyword? (-> dat #'kwd))
    #'(op-match-xpnd rst . bdy))
   (((pat exp . rst) . bdy)
    #'(match exp (pat (match-xpnd rst . bdy)))))
@@ -74,9 +75,9 @@
     (if (nil? params) params
         (syn-case params (:o :as)
           ((:o . rst)
-           #`((#'tmp #:o) #,@(gen-params #'rst)))
+           #`((#:o #:o) #,@(parse-params #'rst)))
           (((pat :as var) . rst)
-           #`((pat var) #,@(gen-params #'rst)))
+           #`((pat var) #,@(parse-params #'rst)))
           ((pat . rst) #`((pat #,(syn (gensym) #'pat))
                           #,@(parse-params #'rst))))))
   
