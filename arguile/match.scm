@@ -14,9 +14,9 @@
   ((name exp)
    #'(_def name exp))
   ((name (pat ... . rst) b1 b2 ...)
-   (let-syn exps #`(#,@(gen-params #'(pat ...)) . rst)
-     #`(_def name exps
-         (match-xpnd #,(splice (zip #'(pat ...) #'exps)) b1 b2 ...)))))
+   (let-syn pat:exps #`(#,@(parse-params #'(pat ...)) . rst)
+     #`(_def name #,(map cadr #'pat:exps)
+         (match-xpnd #,(splice #'pat:exps) b1 b2 ...)))))
 
 (mac let
   ((pat exp . bdy) #'(w/ (pat exp) . bdy)))
@@ -64,19 +64,21 @@
   ((() . bdy)
    #'(do . bdy))
   (((pat exp . rst) . bdy)
-   (do  (prn (dat #'pat) (dat #'exp))
-       #'(if-match exp (pat (op-match-xpnd rst . bdy))))))
+   #'(if-match exp (pat (op-match-xpnd rst . bdy)))))
 
 ;;; TODO: determine if these can be namespaced with base/def
 (eval-when (expand load eval)
 
-  (_def gen-params (pats)
-    (if (nil? pats) pats
-        (syn-case pats (:o)
+  ;; TODO: mac instead?
+  (_def parse-params (params)
+    (if (nil? params) params
+        (syn-case params (:o :as)
           ((:o . rst)
-           #`(#:o #,@(gen-params #'rst)))
-          ((pat . rst) #`(#,(syn (gensym) #'pat)
-                          #,@(gen-params #'rst))))))
+           #`((#'tmp #:o) #,@(gen-params #'rst)))
+          (((pat :as var) . rst)
+           #`((pat var) #,@(gen-params #'rst)))
+          ((pat . rst) #`((pat #,(syn (gensym) #'pat))
+                          #,@(parse-params #'rst))))))
   
   (_def parse-req-pat (pat)
     (syn-case pat ()
