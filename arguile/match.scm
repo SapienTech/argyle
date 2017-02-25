@@ -16,7 +16,6 @@
    #'(_def name exp))
   ((name (pat ... . rst) b1 b2 ...)
    (let-syn pat:exps #`(#,@(parse-params #'(pat ...)) . rst)
-     (prn (dat #'pat:exps))
      #`(_def name #,(map cadr #'pat:exps)
          (match-xpnd #,(splice #'pat:exps) b1 b2 ...)))))
 
@@ -24,7 +23,7 @@
   ((pat exp . bdy) #'(w/ (pat exp) . bdy)))
 
 (mac w/
-  ((pat/exp . bdy) #'(match-xpnd pat/exp . bdy)))
+  ((pat:exp . bdy) #'(match-xpnd pat:exp . bdy)))
 
 ;;; TODO: modularize w/ def
 (mac fn
@@ -32,22 +31,6 @@
    (let-syn pat:exps #`(#,@(parse-params #'(pat ...)) . rst)
      #`(_fn #,(map cadr #'pat:exps)
          (match-xpnd #,(splice #'pat:exps) b1 b2 ...)))))
-
-
-(mac tbl-match (:keys)
-  ((tbl ((:keys key ...) . bdy))
-   #`(match tbl (($ <tbl>)
-                 (w/keys (key ...) tbl
-                         #,@#'bdy)))))
-
-;;; TODO: determine if we want :keys or 'keys
-(mac w/keys
-  (((key ...) tbl bdy)
-   #`(w/ #,(splice
-            (map (fn (key)
-                   #`(#,key (tbl '#,key)))
-                 #'(key ...)))
-       bdy)))
 
 (mac match-xpnd (:keys)
   ((() . bdy)
@@ -59,6 +42,35 @@
    #'(op-match-xpnd rst . bdy))
   (((pat exp . rst) . bdy)
    #'(match exp (pat (match-xpnd rst . bdy)))))
+
+(mac tbl-match (:keys)
+  ((tbl ((:keys key ...) . bdy))
+   #`(match tbl (($ <tbl>)
+                 (w/keys (key ...) tbl
+                         #,@#'bdy)))))
+
+;;; TODO: determine if we want :keys or 'keys
+(mac w/keys
+  (((key ...) tbl bdy)
+   #`(w/ #,(splice
+            (map (_fn (key)
+                   #`(#,key (tbl '#,key)))
+                 #'(key ...)))
+       bdy)))
+
+;;; TODO: modularize
+(mac if-match (:or)
+     ((exp ((pat :or val) bdy) . rst)
+      (_let pat-ids (flatten (rec-filter sym? `(,(-> dat #'pat))))
+            (let-syn pat-vars (map (_fn (id) (-> syn id #'pat)) pat-ids)
+              #`(if exp (match exp (pat bdy) . rst)
+                    (match val (pat bdy) . rst)))))
+     ((exp (pat bdy) . rst)
+      (_let pat-ids (flatten (rec-filter sym? `(,(-> dat #'pat))))
+            (let-syn pat-vars (map (_fn (id) (-> syn id #'pat)) pat-ids)
+              #`(if exp (match exp (pat bdy) . rst)
+                    (_w/ #,(splice (zip #'pat-vars (map (const #f) #'pat-vars)))
+                         bdy))))))
 
 (mac op-match-xpnd
   ((() . bdy)
@@ -86,26 +98,26 @@
       ((_) (syn (gensym) #'pat))))
 
   (_def flatten (lst)
-        (append-map (fn (elt)
-                      (if (list? elt) (flatten elt)
-                          `(,elt)))
-                    lst))
+    (append-map (_fn (elt)
+                  (if (list? elt) (flatten elt)
+                      `(,elt)))
+                lst))
   
   (_def rec-filter (pred lst)
-        (loop lp ((for elt (in-list lst)))
-          => '()
-          (cond ((list? elt)
-                 (_let filtered-elt (rec-filter pred elt)
-                       (if (nil? filtered-elt) (lp)
-                           (cons filtered-elt (lp)))))
-                ((pred elt) (cons elt (lp)))
-                (else (lp)))))
+    (loop lp ((for elt (in-list lst)))
+      => '()
+      (cond ((list? elt)
+             (_let filtered-elt (rec-filter pred elt)
+               (if (nil? filtered-elt) (lp)
+                   (cons filtered-elt (lp)))))
+            ((pred elt) (cons elt (lp)))
+            (else (lp)))))
   
   (_def ids (pat)
-        (flatten
-         (loop lp ((for pat (in-list pat)))
-           (cond ((identifier? pat) (list pat))
-                 ((list? pat) (ids pat)))
-           pat)))
+    (flatten
+     (loop lp ((for pat (in-list pat)))
+       (cond ((identifier? pat) (list pat))
+             ((list? pat) (ids pat)))
+       pat)))
   (_def splice (lst)              ;TODO: use general ver.
-        (reduce append '() (reverse lst))))
+    (reduce append '() (reverse lst))))
