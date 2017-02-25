@@ -1,7 +1,7 @@
 (module (arguile base type sym))
 (use (arguile base fn))
 (defp sym? symbol?)
-(defp sym->kwrd symbol->keyword)
+(defp sym->kwd symbol->keyword)
 (defp sym->str symbol->string)
 (defp sym-join symbol-append)
 (defp sym: symbol-fref)

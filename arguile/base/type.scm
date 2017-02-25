@@ -12,7 +12,7 @@
      (arguile base type sym)
      (arguile base type syn)
      (arguile base type chr)
-     (arguile base type kwrd)
+     (arguile base type kwd)
      (arguile base type strm))
 
 ;;; TODO: add simple heirarchy
@@ -30,7 +30,7 @@
   ((hash-table? x) 'hash-tbl)
   ((chr? x)        'chr)
   ((vector? x)     'vector)
-  ((kwrd? x)       'kwrd)
+  ((kwd? x)       'kwd)
   ;; TODO: is null? useful as a type?
   ((null? x)       'sym)
   (else            (error "Type: unknown type" x))))
@@ -63,7 +63,7 @@
             (num ,(fn (dat ctx) (dat->syn ctx dat)))
             (str ,(fn (dat ctx) (dat->syn ctx dat)))
             (sym ,(fn (dat ctx) (dat->syn ctx dat)))
-            (kwrd ,(fn (dat ctx) (dat->syn ctx dat))))
+            (kwd ,(fn (dat ctx) (dat->syn ctx dat))))
        (str (int ,num->str)
             (num ,num->str)
             (chr ,string)
@@ -110,5 +110,5 @@
  (arguile base type sym)
  (arguile base type syn)
  (arguile base type chr)
- (arguile base type kwrd)
+ (arguile base type kwd)
  (arguile base type strm))

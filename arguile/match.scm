@@ -38,7 +38,7 @@
   ((((:keys key ...) tbl . rst) . bdy)
    #'(tbl-match tbl ((:keys key ...)
                      (match-xpnd rst . bdy))))
-  (((kwd kwd' . rst) . bdy) (keyword? (-> dat #'kwd))
+  (((kwd kwd' . rst) . bdy) (kwd? (-> dat #'kwd))
    #'(op-match-xpnd rst . bdy))
   (((pat exp . rst) . bdy)
    #'(match exp (pat (match-xpnd rst . bdy)))))

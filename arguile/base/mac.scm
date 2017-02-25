@@ -32,7 +32,6 @@
              #,@(receive (defs cases) (parse-mac #'(exp ...))
                   (if (null? cases) defs
                       #`(#,@defs (syntax-case ctx (f1 ...)
-
                                    #,@(format cases)))))))))))
 
 (eval-when (compile load eval)
