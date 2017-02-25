@@ -4,7 +4,8 @@
      ((arguile base fn)
       #:select ((def . _def)
                 (let . _let)
-                (w/ . _w/)))
+                (w/ . _w/)
+                (fn . _fn)))
      ((arguile data tbl) #:select (<tbl>))
      (arguile loop)
      (arguile match compat)
@@ -25,15 +26,13 @@
 (mac w/
   ((pat/exp . bdy) #'(match-xpnd pat/exp . bdy)))
 
-(mac if-match (:or)
-     ((exp ((pat :or val) bdy) . rst)
-      (_let pat-ids (flatten (rec-filter sym? `(,(-> dat #'pat))))
-        (let-syn pat-vars (map (fn (id) (-> syn id #'pat)) pat-ids)
-          #`(if exp (match exp (pat bdy) . rst)
-                (_w/ #,(splice (zip #'pat-vars (map (const #f) #'pat-vars)))
-                     bdy)))))
-     ((exp (pat bdy) rst ...)
-      #'(if-match exp ((pat :or #f) bdy) rst ...)))
+;;; TODO: modularize w/ def
+(mac fn
+  (((pat ... . rst) b1 b2 ...)
+   (let-syn pat:exps #`(#,@(parse-params #'(pat ...)) . rst)
+     #`(_fn #,(map cadr #'pat:exps)
+         (match-xpnd #,(splice #'pat:exps) b1 b2 ...)))))
+
 
 (mac tbl-match (:keys)
   ((tbl ((:keys key ...) . bdy))
