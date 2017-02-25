@@ -15,12 +15,12 @@
               #:app fn))
    #`(%%data imm? (name (field ...) #:init (mke arg ...) spec ... #:app fn)))
   ((imm? (name (field ...) spec ... #:app fn))
-   #`(%data imm? (name (field ...) #:init (#,(std-mke #'name x) field ...)
+   #`(%data imm? (name (field ...) #:init (#,(std-mke #'name) field ...)
                        spec ... #:app fn)))
   ((imm? (name (field ...) #:init (mke arg ...) spec ...))
    #`(%data imm? (name (field ...) #:init (mke arg ...) spec ... #:app (not-app 'name))))
   ((imm? (name (field ...) spec ...))
-   #`(%data imm? (name (field ...) #:init (#,(std-mke #'name x) field ...)
+   #`(%data imm? (name (field ...) #:init (#,(std-mke #'name) field ...)
                        spec ... #:app (not-app 'name)))))
 
 (mac %%data
@@ -44,7 +44,6 @@
                (#,(if (dat #'imm?) #'let #'ret)
                 self (apply %mke args) (app! self fn))))))))
 
-
 (def data-type? record-type?)
 (def data? record?)
 (def data-type (obj)
@@ -52,7 +51,7 @@
 
 (eval-when (expand load eval)
 
- (def std-mke (name ctx) (syn (dat name) ctx))
+ (def std-mke (name) (syn (dat name) name))
  
  (def mke-app-spec (name ctx)
    (syn (mke-field-spec name 'fn) ctx))
