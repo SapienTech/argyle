@@ -49,8 +49,8 @@
   ((name (arg ...) body ...)
    #'(define-inlinable (name arg ...) body ...)))
 
-(eval-when (expand load eval)
-  (def comp compose)
-  (def id? identifier?)
-  (def defd? defined?)
-  (def wrap const))
+(defp app apply)
+(defp comp compose)
+(defp id? identifier?)
+(defp defd? defined?)
+(defp wrap const)
