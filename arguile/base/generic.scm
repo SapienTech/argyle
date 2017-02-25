@@ -32,7 +32,7 @@
         ((str? x) (str-len x))
         ((hash-table? x) (hash-count (const #t) x))
         ((vector? x) (vector-length x))
-        (else (length x))))
+        (else (_length x))))
 
 (def one-of (tests val)
   (if (null? tests) #f
