@@ -57,20 +57,25 @@
                  #'(key ...)))
        bdy)))
 
+;;; TODO: only one body
+(mac let-syn-vars
+  ((vars pat body)
+   #'(_let pat-ids (flatten (rec-filter sym? `(,(-> dat #'pat))))
+         (let-syn vars (map (_fn (id) (-> syn id #'pat)) pat-ids)
+           body))))
+
 ;;; TODO: modularize
 ;;; TODO: add :as
 (mac if-match (:or)
      ((exp ((pat :or val) bdy))
-      (_let pat-ids (flatten (rec-filter sym? `(,(-> dat #'pat))))
-            (let-syn pat-vars (map (_fn (id) (-> syn id #'pat)) pat-ids)
-              #`(if exp (match exp (pat bdy))
-                    (match val (pat bdy))))))
+      (let-syn-vars pat-vars pat
+                    #`(if exp (match exp (pat bdy))
+                        (match val (pat bdy)))))
      ((exp (pat bdy))
-      (_let pat-ids (flatten (rec-filter sym? `(,(-> dat #'pat))))
-            (let-syn pat-vars (map (_fn (id) (-> syn id #'pat)) pat-ids)
-              #`(if exp (match exp (pat bdy))
-                    (_w/ #,(splice (zip #'pat-vars (map (const #f) #'pat-vars)))
-                         bdy))))))
+      (let-syn-vars pat-vars pat
+                    #`(if exp (match exp (pat bdy))
+                          (_w/ #,(splice (zip #'pat-vars (map (const #f) #'pat-vars)))
+                               bdy)))))
 
 (mac op-match-xpnd
   ((() . bdy)
@@ -87,6 +92,8 @@
         (syn-case params (:o :as)
           ((:o . rst)
            #`((#:o #:o) #,@(parse-params #'rst)))
+          (((pat :as var :or val) . rst)
+           #`(((pat :or val) var) #,@(parse-params #'rst)))
           (((pat :as var) . rst)
            #`((pat var) #,@(parse-params #'rst)))
           ((pat . rst) #`((pat #,(syn (gensym) #'pat))
@@ -103,11 +110,11 @@
                       `(,elt)))
                 lst))
 
-  (_def my-filter (pred obj)
+  (_def rec-filter (pred obj)
     (cond ((and (pair? obj) (nil? obj)) '(wha))
           ((pair? obj)
-           (append (my-filter pred (car obj))
-                   (my-filter pred (cdr obj))))
+           (append (rec-filter pred (car obj))
+                   (rec-filter pred (cdr obj))))
           ((pred obj) `(,obj))
           (else '())))
   
