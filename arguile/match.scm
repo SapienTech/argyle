@@ -2,11 +2,11 @@
 (export-syntax w/ let def)
 (use (arguile base)
      ((arguile base fn)
-      #:select ((def . _def)
-                (let . _let)
-                (w/ . _w/)
-                (fn . _fn)))
-     ((arguile data tbl) #:select (<tbl>))
+      :select ((def . _def)
+               (let . _let)
+               (w/ . _w/)
+               (fn . _fn)))
+     ((arguile data tbl) :select (<tbl>))
      (arguile loop)
      (arguile match compat)
      ((srfi srfi-1) :select (zip reduce append-map)))
@@ -49,7 +49,6 @@
                  (w/keys (key ...) tbl
                          #,@#'bdy)))))
 
-;;; TODO: determine if we want :keys or 'keys
 (mac w/keys
   (((key ...) tbl bdy)
    #`(w/ #,(splice
@@ -59,16 +58,17 @@
        bdy)))
 
 ;;; TODO: modularize
+;;; TODO: add :as
 (mac if-match (:or)
-     ((exp ((pat :or val) bdy) . rst)
+     ((exp ((pat :or val) bdy))
       (_let pat-ids (flatten (rec-filter sym? `(,(-> dat #'pat))))
             (let-syn pat-vars (map (_fn (id) (-> syn id #'pat)) pat-ids)
-              #`(if exp (match exp (pat bdy) . rst)
-                    (match val (pat bdy) . rst)))))
-     ((exp (pat bdy) . rst)
+              #`(if exp (match exp (pat bdy))
+                    (match val (pat bdy))))))
+     ((exp (pat bdy))
       (_let pat-ids (flatten (rec-filter sym? `(,(-> dat #'pat))))
             (let-syn pat-vars (map (_fn (id) (-> syn id #'pat)) pat-ids)
-              #`(if exp (match exp (pat bdy) . rst)
+              #`(if exp (match exp (pat bdy))
                     (_w/ #,(splice (zip #'pat-vars (map (const #f) #'pat-vars)))
                          bdy))))))
 
@@ -102,16 +102,14 @@
                   (if (list? elt) (flatten elt)
                       `(,elt)))
                 lst))
-  
-  (_def rec-filter (pred lst)
-    (loop lp ((for elt (in-list lst)))
-      => '()
-      (cond ((list? elt)
-             (_let filtered-elt (rec-filter pred elt)
-               (if (nil? filtered-elt) (lp)
-                   (cons filtered-elt (lp)))))
-            ((pred elt) (cons elt (lp)))
-            (else (lp)))))
+
+  (_def my-filter (pred obj)
+    (cond ((and (pair? obj) (nil? obj)) '(wha))
+          ((pair? obj)
+           (append (my-filter pred (car obj))
+                   (my-filter pred (cdr obj))))
+          ((pred obj) `(,obj))
+          (else '())))
   
   (_def ids (pat)
     (flatten
