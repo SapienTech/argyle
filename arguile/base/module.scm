@@ -1,6 +1,6 @@
 (module (arguile base module)
-    #:export (re-export-modules))
-(use ((srfi srfi-1) #:select (append-map))
+    :export (re-export-modules))
+(use ((srfi srfi-1) :select (append-map))
      (arguile base mac)
      (arguile base fn))
 

@@ -1,5 +1,5 @@
 (module (arguile base generic)
-  #:replace (+ * length))
+  :replace (+ * length))
 (use (arguile guile)
      (arguile base fn)
      (arguile base type)) 

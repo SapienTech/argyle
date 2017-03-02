@@ -1,6 +1,6 @@
 (module (arguile generic)
-  #:replace (map)
-  #:export (gen gen-fn? xtnd type
+  :replace (map)
+  :export (gen gen-fn? xtnd type
                 len rev join cpy clr!))
 (use (arguile base)
      (arguile data)
@@ -9,7 +9,7 @@
      (arguile data q)
      (arguile guile)
      (arguile loop)
-     ((srfi srfi-1) #:select (unzip2)))
+     ((srfi srfi-1) :select (unzip2)))
 
 (mac gen
   ((name) (id? #'name)

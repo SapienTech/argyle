@@ -1,6 +1,6 @@
 (module (arguile data records)
-  #:replace (record record? record-type?)
-  #:export (define-record-type))
+  :replace (record record? record-type?)
+  :export (define-record-type))
 (use (srfi srfi-1)
      (system base ck))
 

@@ -1,5 +1,5 @@
 (module (arguile)
-  #:duplicates (last))
+  :duplicates (last))
 (use (arguile base)
      (arguile match)
      (arguile data)

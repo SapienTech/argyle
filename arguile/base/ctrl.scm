@@ -1,6 +1,6 @@
 (module (arguile base ctrl)
-    #:replace (do = aif it & $> nil?))
-(use ((srfi srfi-1) #:select (append-map lset-difference))
+    :replace (do = aif it & $> nil?))
+(use ((srfi srfi-1) :select (append-map lset-difference))
      (arguile guile)
      (arguile base mac)
      (arguile base fn)

@@ -1,5 +1,5 @@
 (module (arguile base io)
-  #:export (pr prn prnn))
+  :export (pr prn prnn))
 (use (arguile base mac)
      (arguile base ctrl))
 

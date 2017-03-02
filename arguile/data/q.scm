@@ -1,5 +1,5 @@
 (module (arguile data q)
-  #:export (q %mke-q q? q-nil?
+  :export (q %mke-q q? q-nil?
             enq! deq!
             q-hd q-hd! q-tl q-tl! q-len q-len! q-fn q-fn!
             q->lst lst->q q->vec vec->q))

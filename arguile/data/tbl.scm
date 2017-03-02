@@ -1,5 +1,5 @@
 (module (arguile data tbl)
-  #:export (<tbl> tbl tbl? tbl-t tbl-t! tbl-fn tbl-fn!))
+  :export (<tbl> tbl tbl? tbl-t tbl-t! tbl-fn tbl-fn!))
 (use (arguile base)
      ((arguile guile) :select (grp))
      (arguile data))

@@ -23,7 +23,7 @@
 ;;; Code:
 
 (module (arguile data immutable)
-  #:export (set-record-type-printer!
+  :export (set-record-type-printer!
             define-immutable-record-type
             set-field
             set-fields))

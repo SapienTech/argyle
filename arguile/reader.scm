@@ -9,7 +9,7 @@
      (ice-9 regex)
      (ice-9 match)                      ; tmp
      (rnrs io ports)
-     ((srfi srfi-1) #:select (take reduce zip delete-duplicates drop)))
+     ((srfi srfi-1) :select (take reduce zip delete-duplicates drop)))
 
 (read-disable 'square-brackets)
 

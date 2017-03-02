@@ -1,5 +1,5 @@
 (module (arguile base type)
-  #:export (base-type coerce ->))
+  :export (base-type coerce ->))
 (use (arguile base mac)
      (arguile base fn)
      (arguile base ctrl)

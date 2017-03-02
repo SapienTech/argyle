@@ -1,5 +1,5 @@
 (module (arguile monad)
-  #:export (;; Monads.
+  :export (;; Monads.
             monad monad? monad-bind monad-return
 
             ;; Syntax.
@@ -12,7 +12,7 @@
             state-return state-bind curr-state curr-state!
             state-push state-pop run-w/state))
 (use ((system syntax)
-      #:select (syntax-local-binding))
+      :select (syntax-local-binding))
      (arguile base) (arguile guile) (arguile data) (arguile loop)
      (arguile generic)
      (ice-9 match)

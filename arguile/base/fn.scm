@@ -1,5 +1,5 @@
 (module (arguile base fn)
-    #:replace (fn fn-case def defp let ret w/ \\ ->> inline comp id? defd? wrap))
+    :replace (fn fn-case def defp let ret w/ \\ ->> inline comp id? defd? wrap))
 (use (arguile guile)
      (arguile base mac)
      (ice-9 receive))

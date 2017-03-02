@@ -1,9 +1,9 @@
 (module (arguile data)
-    #:export (data trans data? data-type? data-type))
+    :export (data trans data? data-type? data-type))
 (use (arguile base)
      (arguile data records)
      (arguile data immutable)
-     ((srfi srfi-1) #:select (first)))
+     ((srfi srfi-1) :select (first)))
 
 (mac data (patt #'(%data #t patt)))
 (mac trans (patt #'(%data #f patt)))

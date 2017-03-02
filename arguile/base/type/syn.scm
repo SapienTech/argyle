@@ -1,5 +1,5 @@
 (module (arguile base type syn)
-    #:export (syn? syn->dat dat->syn))
+    :export (syn? syn->dat dat->syn))
 (use (arguile base fn)
      (arguile guile))
 

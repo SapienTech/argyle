@@ -1,5 +1,5 @@
 (module (arguile base mac)
-    #:export (mac mac? syn-case let-syn w/syn
+    :export (mac mac? syn-case let-syn w/syn
                   syn-param w/syn-params gen-tmps))
 (use (arguile guile)
      (ice-9 receive))
