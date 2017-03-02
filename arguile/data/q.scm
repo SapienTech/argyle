@@ -8,8 +8,8 @@
      (arguile data vec))
 
 (trans q (len hd tl)
-      #:init (%mke-q len hd tl)
-      #:app (case-lambda
+      :init (%mke-q len hd tl)
+      :app (case-lambda
               (() (deq! self))
               ((k) (enq! self k))))
 

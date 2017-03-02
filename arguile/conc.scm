@@ -17,7 +17,7 @@
 (defp mke-futr make-future)
 
 (data ref (val mutx)
-      #:init (%ref val mutx))
+      :init (%ref val mutx))
 
 (defp ref (val) (%ref val (make-mutex)))
 

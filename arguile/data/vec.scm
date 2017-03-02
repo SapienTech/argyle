@@ -6,8 +6,8 @@
 
 ;;; TODO: add optional fill
 (trans vec (v)
-      #:init (%mke-vec v)
-      #:app (let v (vec-v self)
+      :init (%mke-vec v)
+      :app (let v (vec-v self)
               (fn-case
                (() v)
                ((k) (vector-ref v k))

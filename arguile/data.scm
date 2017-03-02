@@ -8,25 +8,25 @@
 (mac data (patt #'(%data #t patt)))
 (mac trans (patt #'(%data #f patt)))
 
-(mac %data x
+(mac %data x (:init :app)
   ((imm? (name (field ...)
-              #:init (mke arg ...)
+              :init (mke arg ...)
               spec ...
-              #:app fn))
-   #`(%%data imm? (name (field ...) #:init (mke arg ...) spec ... #:app fn)))
-  ((imm? (name (field ...) spec ... #:app fn))
-   #`(%data imm? (name (field ...) #:init (#,(std-mke #'name) field ...)
-                       spec ... #:app fn)))
-  ((imm? (name (field ...) #:init (mke arg ...) spec ...))
-   #`(%data imm? (name (field ...) #:init (mke arg ...) spec ... #:app (not-app 'name))))
+              :app fn))
+   #`(%%data imm? (name (field ...) :init (mke arg ...) spec ... :app fn)))
+  ((imm? (name (field ...) spec ... :app fn))
+   #`(%data imm? (name (field ...) :init (#,(std-mke #'name) field ...)
+                       spec ... :app fn)))
+  ((imm? (name (field ...) :init (mke arg ...) spec ...))
+   #`(%data imm? (name (field ...) :init (mke arg ...) spec ... :app (not-app 'name))))
   ((imm? (name (field ...) spec ...))
-   #`(%data imm? (name (field ...) #:init (#,(std-mke #'name) field ...)
-                       spec ... #:app (not-app 'name)))))
+   #`(%data imm? (name (field ...) :init (#,(std-mke #'name) field ...)
+                       spec ... :app (not-app 'name)))))
 
 (mac %%data
   ((imm? (name (field ...)
-               #:init (mke arg ...) spec ...
-               #:app fn))
+               :init (mke arg ...) spec ...
+               :app fn))
    (let name' (dat #'name)
      (w/syn (type (syn (+ '< name' '>) #'name)
              %mke (syn (+ '% (dat #'mke)) #'name)

@@ -18,8 +18,8 @@
                                   #'(t 'def name)))))))
 
 (trans gen-fn (name tbl)
-      #:init (%gen-fn name tbl)
-      #:app (fn args
+      :init (%gen-fn name tbl)
+      :app (fn args
               (apply (resolve-fn (gen-fn-tbl self) args)
                      args)))
 
