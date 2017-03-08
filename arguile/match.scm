@@ -5,19 +5,28 @@
       :select ((def . _def)
                (let . _let)
                (w/ . _w/)
-               (fn . _fn)))
+               (fn . _fn)
+               (fn-case . _fn-case)))
      ((arguile data tbl) :select (<tbl>))
      (arguile loop)
      (arguile match compat)
      ((srfi srfi-1) :select (zip reduce append-map)))
 
+(mac fn
+  ((args b1 b2 ...)
+   #`(_fn #,@(fn-match #'(args b1 b2 ...)))))
+
+(mac fn-case
+  ((((pat ... . rst) b1 b2 ...) ...)
+   #`(_fn-case
+      #,@(map fn-match
+              #'(((pat ... . rst) b1 b2 ...) ...)))))
+
 (mac def
   ((name exp)
    #'(_def name exp))
   ((name (pat ... . rst) b1 b2 ...)
-   (let-syn pat:exps #`(#,@(parse-params #'(pat ...)) . rst)
-     #`(_def name #,(map cadr #'pat:exps)
-         (match-xpnd #,(splice #'pat:exps) b1 b2 ...)))))
+   #`(_def name #,@(fn-match #'((pat ... . rst) b1 b2 ...)))))
 
 (mac let
   ((pat exp . bdy) #'(w/ (pat exp) . bdy)))
@@ -26,12 +35,6 @@
   ((pat:exp . bdy) #'(match-xpnd pat:exp . bdy)))
 
 ;;; TODO: modularize w/ def
-(mac fn
-  (((pat ... . rst) b1 b2 ...)
-   (let-syn pat:exps #`(#,@(parse-params #'(pat ...)) . rst)
-     #`(_fn #,(map cadr #'pat:exps)
-         (match-xpnd #,(splice #'pat:exps) b1 b2 ...)))))
-
 (mac match-xpnd (:keys)
   ((() . bdy)
    #'(do . bdy))
@@ -85,7 +88,13 @@
 
 ;;; TODO: determine if these can be namespaced with base/def
 (eval-when (expand load eval)
-
+  (_def fn-match (exp)
+    (syn-case exp ()
+      (((pat ... . rst) b1 b2 ...)
+       (let-syn pat:exps #`(#,@(parse-params #'(pat ...)) . rst)
+         #`(#,(map cadr #'pat:exps)
+            (match-xpnd #,(splice #'pat:exps) b1 b2 ...))))))
+  
   ;; TODO: mac instead?
   (_def parse-params (params)
     (if (nil? params) params
