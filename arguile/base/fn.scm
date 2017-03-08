@@ -4,19 +4,27 @@
      (arguile base mac)
      (ice-9 receive))
 
-(mac fn
-  ((args body ...) #'(lambda args body ...)))
+(mac def x
+  ((name (arg ... . rst) e1 e2 ...)
+   #`(define* (name #,@(expand-kwargs #'(arg ...) x) . rst)
+       e1 e2 ...))
+  ((name val) #'(define name val)))
+
+(mac fn x
+  (((arg ... . rst) body ...)
+   #`(lambda* (#,@(expand-kwargs #'(arg ...) x) . rst)
+       body ...)))
+
+(def fn-xpnd (fn-exp)
+  (syn-case fn-exp ()
+    (((arg ... . rst) body ...)
+     #`((#,@(expand-kwargs #'(arg ...) fn-exp) . rst)
+        body ...))))
 
 (mac fn-case
-  ((fn1 fn2 ...) #'(case-lambda fn1 fn2 ...)))
-
-(mac def x
-  ((name (arg ... . rest) e1 e2 ...)
-   #`(#,@(if (has-kwargs? #'(arg ...))
-             #`(define* (name #,@(expand-kwargs #'(arg ...) x) . rest))
-             #'(define (name arg ... . rest)))
-      e1 e2 ...))
-  ((name val) #'(define name val)))
+  ((f1 f2 ...)
+   #`(case-lambda*
+      #,@(map fn-xpnd #'(f1 f2 ...)))))
 
 (mac defp
   ((name . rest) #'(begin (def name . rest) (export name))))
