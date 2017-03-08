@@ -77,6 +77,7 @@
 (gen map)
 
 (xtnd len (s str) (str-len s))
+(xtnd len (n int) (len (str n)))
 (xtnd len (t tbl) (tbl-cnt (const #t) t))
 (xtnd len (v vec) (vec-len v))
 (xtnd len (q q) (q-len q))
