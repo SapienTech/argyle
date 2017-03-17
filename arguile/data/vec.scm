@@ -1,5 +1,5 @@
 (module (arguile data vec)
-  :export (vec vec? vec-fn vec-fn!))
+  :export (<vec> vec vec? vec-fn vec-fn!))
 (use (arguile base)
      (arguile data)
      (srfi srfi-43))

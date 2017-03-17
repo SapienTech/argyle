@@ -62,8 +62,8 @@
  
  (def mke-field-specs (name fields specs ctx)
    (syn (map (\\ mke-field-spec name _)
-             (set\ eq? (-> dat fields)
-                       (map first (-> dat specs)))) ctx))
+             (set\ eq? (dat fields)
+                       (map first (dat specs)))) ctx))
  (def not-app (name)
    (fn args (err "Wrong type to apply:" name
                  "data-type not applicable"))))

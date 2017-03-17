@@ -8,9 +8,9 @@
   (cond ((null? args) 0)
         ((num? (car args)) (apply _+ args))
         ((one-of `(,str? ,chr?) (car args))
-         (apply str-join (map (\\ -> str _) args)))
+         (apply str-join (map str args)))
         ((sym? (car args))
-         (apply sym-join (map (\\ -> sym _) args)))
+         (apply sym-join (map sym args)))
         (else (apply _+ args))))
 
 ;;; TODO: Add cartesian product for data
@@ -19,11 +19,11 @@
         ((num? (car args)) (apply _* args))
         ((one-of `(,str? ,chr?) (car args))
          (apply str-join
-                (map (fn (val) (-> str (car args)))
+                (map (fn (val) (str (car args)))
                      (iota (apply _* (cdr args))))))
         ((sym? (car args))
          (apply sym-join
-                (map (fn (val) (-> sym (car args)))
+                (map (fn (val) (sym (car args)))
                      (iota (apply _* (cdr args))))))
         (else (apply _* args))))
 
