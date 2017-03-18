@@ -6,6 +6,7 @@
      (arguile base generic)
      (arguile base err)
      (arguile base io)
+     (arguile base math)
      (arguile base module))
 
 (re-export-modules (arguile base mac)
@@ -15,4 +16,5 @@
                    (arguile base generic)
                    (arguile base err)
                    (arguile base io)
+                   (arguile base math)
                    (arguile base module))

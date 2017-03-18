@@ -9,7 +9,7 @@
      (arguile data q)
      (arguile guile)
      (arguile loop)
-     ((srfi srfi-1) :select (unzip2)))
+     (srfi srfi-1))
 
 (mac gen
   ((name) (id? #'name)
@@ -76,11 +76,18 @@
 (gen clr!)
 (gen map)
 
+(gen car)
+(gen cdr)
+(gen take)
+(gen drop)
+(gen nth)
+
 (xtnd len (s <str>) (str-len s))
 (xtnd len (n <int>) (len (str n)))
 (xtnd len (t <tbl>) (tbl-cnt (const #t) t))
 (xtnd len (v <vec>) (vec-len v))
 (xtnd len (q <q>) (q-len q))
+(xtnd len (stream <strm>) (strm-len stream))
 
 ;;; TODO: doesnt work
 (xtnd rev (v <vec>) (ret v* (mke-vec (vec-len v))
@@ -96,7 +103,12 @@
 
 (xtnd clr! (t <tbl>) (tbl-clr! t))
 (xtnd clr! (q <q>) (q-hd! q '()) (q-tl! q '()) (q-len! q 0))
-
 (xtnd map (f <fn> v <vec> . rst) (apply vec-map f v rst))
 (xtnd map (f <fn> s <str> . rst) (apply str-map f s rst))
 (xtnd map (f <fn> t <tbl>)       (tbl-map->lst f t))
+
+(xtnd car (seq <strm>) (scar seq))
+(xtnd cdr (seq <strm>) (scdr seq))
+(xtnd take (seq <strm> k <int>) (strm-take k seq))
+(xtnd drop (seq <strm> k <int>) (strm-drop k seq))
+(xtnd kth (seq <lst> k <int>) (list-ref seq n))
