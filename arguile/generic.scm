@@ -29,8 +29,8 @@
 (def resolve-fn (tbl args)
   (loop lp ((for arg (in-list args))
             (where t tbl (and=> t (\\ _ (type arg)))))
-        => (cond (t (t 'fun) (t 'fun))
-                 (t (t 'rst) (t 'rst)) 
+        => (cond ((and t (t 'fun)) (t 'fun))
+                 ((and t (t 'rst)) (t 'rst))
                  ((tbl 'def) (tbl 'def))
                  (else (err "No generic fn for args1:" args)))
     ;; This handles . rest case
