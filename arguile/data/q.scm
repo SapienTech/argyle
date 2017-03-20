@@ -1,6 +1,6 @@
 (module (arguile data q)
-  :export (q %mke-q q? q-nil?
-            enq! deq!
+  :export (<q> q mke-q %mke-q q? q-nil?
+            q-pk enq! deq!
             q-hd q-hd! q-tl q-tl! q-len q-len! q-fn q-fn!
             q->lst lst->q q->vec vec->q))
 (use (arguile base)
@@ -14,7 +14,12 @@
               ((k) (enq! self k))))
 
 (defp mke-q () (%mke-q 0 '() '()))
+(defp q args (%mke-q (length args) args '()))
 (defp q-nil? (q) (0? (q-len q)))
+(defp q-pk (q) (if (nil? (q-hd q))
+                   (if (nil? (q-tl q)) #f
+                       (car (q-tl q)))
+                   (car (q-hd q))))
 
 (defp enq! (q obj)
   (q-tl! q (cons obj (q-tl q)))
