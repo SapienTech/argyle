@@ -1,7 +1,8 @@
 (module (arguile generic)
-  :replace (map)
-  :export (gen gen-fn? xtnd type
-                len rev join cpy clr!))
+  :replace (map car cdr take drop)
+  :export (gen <gen-fn> gen-fn? xtnd type
+           len rev join cpy clr! kth))
+
 (use (arguile base)
      (arguile data)
      (arguile data tbl)
@@ -22,8 +23,8 @@
 (trans gen-fn (name tbl)
       :init (%gen-fn name tbl)
       :app (fn args
-              (apply (resolve-fn (gen-fn-tbl self) args)
-                     args)))
+             (apply (resolve-fn (gen-fn-tbl self) args)
+                    args)))
 
 ;;; This version works, but needs cleanup
 (def resolve-fn (tbl args)
@@ -67,22 +68,20 @@
   (def len length)
   (def rev reverse)
   (def join append)
-  (def cpy lst-cpy)
-  (def clr! (lst) (set-cdr! lst '()))
-  (def map (@ (ice-9 r5rs) map)))
+  (def cpy lst-cpy))
 
-(gen len)
-(gen rev)
-(gen join)
-(gen cpy)
-(gen clr!)
+(gen len length)
+(gen rev reverse)
+(gen join append)
+(gen cpy lst-cpy)
+(gen clr! (fn (lst) (set-cdr! lst '())))
 (gen map)
 
 (gen car)
 (gen cdr)
+(gen kth list-ref)
 (gen take)
 (gen drop)
-(gen nth)
 
 (xtnd len (s <str>) (str-len s))
 (xtnd len (n <int>) (len (str n)))
@@ -91,7 +90,6 @@
 (xtnd len (q <q>) (q-len q))
 (xtnd len (stream <strm>) (strm-len stream))
 
-;;; TODO: doesnt work
 (xtnd rev (v <vec>) (ret v* (mke-vec (vec-len v))
                       (vec<-! v 0 (vec-len v) v* 0)))
 
@@ -100,17 +98,20 @@
                              (ret v (mke-vec (+ l1 l2))
                                (vec->! v1 0 l1 v 0)
                                (vec->! v2 0 l2 v l1))))
+(xtnd join (s1 <strm> . rst) (apply strm-join s1 rst))
 (xtnd cpy (v <vec>) (vec-cpy v))
 (xtnd cpy (q <q>) (%mke-q (q-len q) (q-hd q) (q-tl q)))
-
 (xtnd clr! (t <tbl>) (tbl-clr! t))
 (xtnd clr! (q <q>) (q-hd! q '()) (q-tl! q '()) (q-len! q 0))
 (xtnd map (f <fn> v <vec> . rst) (apply vec-map f v rst))
 (xtnd map (f <fn> s <str> . rst) (apply str-map f s rst))
-(xtnd map (f <fn> t <tbl>)       (tbl-map->lst f t))
+(xtnd map (f <fn> t <tbl>) (tbl-map->lst f t))
+(xtnd map (f <fn> s <strm> . rst) (apply strm-map f s rst))
 
 (xtnd car (seq <strm>) (scar seq))
+(xtnd car (seq <vec>) (seq 0))
+(xtnd car (seq <q>) (q-pk seq))
 (xtnd cdr (seq <strm>) (scdr seq))
 (xtnd take (seq <strm> k <int>) (strm-take k seq))
 (xtnd drop (seq <strm> k <int>) (strm-drop k seq))
-(xtnd kth (seq <lst> k <int>) (list-ref seq n))
+(xtnd kth (seq <vec> k <int>) (seq k))
