@@ -12,10 +12,12 @@
      (srfi srfi-1))
 
 (mac gen
+  ((name f) (id? #'name)
+   #'(def name (%gen-fn 'name (tbl 'def f))))
   ((name) (id? #'name)
-   #`(def name (%gen-fn 'name (ret t (mke-tbl)
-                                #,(when (defd? (dat #'name))
-                                    #'(t 'def name)))))))
+   #'(def name (%gen-fn 'name (ret t (tbl)
+                                (when (defd? 'name)
+                                  (t 'def name)))))))
 
 (trans gen-fn (name tbl)
       :init (%gen-fn name tbl)
