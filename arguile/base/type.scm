@@ -13,14 +13,14 @@
      (arguile base type syn)
      (arguile base type chr)
      (arguile base type kwd)
-     (arguile base type strm))
+     (arguile base type strm)
+     (arguile base type tup))
 
 ;;; TODO: add simple heirarchy
 (def base-type (x)
  (cond
-  ;; TODO: nest related types
-  ;((pair? x)       'pair)
   ((lst? x)        '<lst>)
+  ((tup? x)        '<tup>)
   ((str? x)        '<str>)
   ((int? x)        '<int>)
   ((num? x)        '<num>)
@@ -107,4 +107,5 @@
  (arguile base type syn)
  (arguile base type chr)
  (arguile base type kwd)
- (arguile base type strm))
+ (arguile base type strm)
+ (arguile base type tup))
