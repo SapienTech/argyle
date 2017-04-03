@@ -68,12 +68,12 @@
   (syntax-rules (=>)
     ((LAZY-LOOP name (loop-clause ...) => result body0 body1+ ...)
      (SYNTACTIC-ERROR-IF-NOT-NAME name ("Invalid lazy loop name:" name)
-       (LAZY (LOOP EAGER-LOOP (loop-clause ...)
+       (STREAM-LAZY (LOOP EAGER-LOOP (loop-clause ...)
                => result
                (LET-SYNTAX ((name
                              (SYNTAX-RULES ()
                                ((name . arguments)
-                                (LAZY (EAGER-LOOP . arguments))))))
+                                (STREAM-LAZY (EAGER-LOOP . arguments))))))
                  body0 body1+ ...)))))))
 
 ;;;; Error Reporting

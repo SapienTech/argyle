@@ -50,7 +50,7 @@
           (only (rnrs mutable-pairs) set-cdr!)
           (only (srfi :1) append-reverse)
           (srfi :8 receive)
-          (arguile lib riastreams)
+          (arguile lib streams)
           (arguile loop)
           (arguile lib private include))
   

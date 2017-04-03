@@ -1,8 +1,7 @@
 (module (arguile base type strm))
 (use (arguile base fn)
      (arguile base mac)
-     (srfi srfi-41)
-     (srfi srfi-45))
+     (arguile lib streams))
 (export scons sfn slet strm-match strm-of)
 
 (defp strm? stream?)

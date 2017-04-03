@@ -59,7 +59,7 @@
     (rnrs)
     (only (rnrs mutable-pairs) set-cdr!)
     (srfi :8 receive)
-    (srfi :45 lazy)
+    (arguile lib streams)
     (arguile lib syn-param)
     (arguile lib private include))
 
@@ -81,5 +81,4 @@
     while
     initial)
 
-  (include-file/downcase ((arguile loop) loop))
-)
+  (include-file/downcase ((arguile loop) loop)))
