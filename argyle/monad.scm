@@ -19,7 +19,7 @@
      (srfi srfi-26))
 
 (data monad (bind return)
-      :init (mke-monad bind return))      ; TODO: Add 'plus' and 'zero'
+  :init (mke-monad bind return))      ; TODO: Add 'plus' and 'zero'
 
 (mac monad (bind return)
   ((name (bind b) (return r))

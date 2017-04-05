@@ -2,7 +2,6 @@
   :replace (map)
   :export (gen <gen-fn> gen-fn? xtnd type
            len rev join cpy clr! kth))
-
 (use (argyle base)
      (argyle data)
      (argyle data tbl)
@@ -21,10 +20,10 @@
                                   (t 'def name)))))))
 
 (trans gen-fn (name tbl)
-      :init (%gen-fn name tbl)
-      :app (fn args
-             (apply (resolve-fn (gen-fn-tbl self) args)
-                    args)))
+  :init (%gen-fn name tbl)
+  :app (fn args
+         (apply (resolve-fn (gen-fn-tbl self) args)
+                args)))
 
 ;;; This version works, but needs cleanup
 (def resolve-fn (tbl args)

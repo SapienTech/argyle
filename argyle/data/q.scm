@@ -8,10 +8,10 @@
      (argyle data vec))
 
 (trans q (len hd tl)
-      :init (%mke-q len hd tl)
-      :app (case-lambda
-              (() (deq! self))
-              ((k) (enq! self k))))
+  :init (%mke-q len hd tl)
+  :app (fn-case
+        (() (deq! self))
+        ((k) (enq! self k))))
 
 (defp mke-q () (%mke-q 0 '() '()))
 (defp q args (%mke-q (length args) args '()))
