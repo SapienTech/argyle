@@ -7,7 +7,7 @@
 ;;; TODO: allow init size and comparison operators
 (trans tbl (t)
   :init (%mke-tbl t)
-  :app (fn-case
+  :app (fns
         (() (tbl-t self))
         ((k) (hash-ref (tbl-t self) k))
         ((k v) (hash-set! (tbl-t self) k v))))

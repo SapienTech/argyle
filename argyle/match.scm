@@ -6,7 +6,7 @@
                (let . _let)
                (w/ . _w/)
                (fn . _fn)
-               (fn-case . _fn-case)))
+               (fns . _fns)))
      ((argyle data tbl) :select (<tbl>))
      (argyle loop)
      (argyle match compat)
@@ -16,9 +16,9 @@
   ((args b1 b2 ...)
    #`(_fn #,@(fn-match #'(args b1 b2 ...)))))
 
-(mac fn-case
+(mac fns
   ((((pat ... . rst) b1 b2 ...) ...)
-   #`(_fn-case
+   #`(_fns
       #,@(map fn-match
               #'(((pat ... . rst) b1 b2 ...) ...)))))
 

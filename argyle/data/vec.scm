@@ -8,7 +8,7 @@
 (trans vec (v)
   :init (%mke-vec v)
   :app (let v (vec-v self)
-         (fn-case
+         (fns
           (() v)
           ((k) (vector-ref v k))
           ((k obj) (vector-set! v k obj)))))

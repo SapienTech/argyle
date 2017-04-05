@@ -9,7 +9,7 @@
 
 (trans q (len hd tl)
   :init (%mke-q len hd tl)
-  :app (fn-case
+  :app (fns
         (() (deq! self))
         ((k) (enq! self k))))
 

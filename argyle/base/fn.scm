@@ -1,5 +1,5 @@
 (module (argyle base fn)
-    :replace (fn fn-case def defp let ret w/ \\ ->> inline comp id? defd? wrap))
+    :replace (fn fns def defp let ret w/ \\ ->> inline comp id? defd? wrap))
 (use (argyle guile)
      (argyle base mac)
      (ice-9 receive))
@@ -21,7 +21,7 @@
      #`((#,@(expand-kwargs #'(arg ...) fn-exp) . rst)
         body ...))))
 
-(mac fn-case
+(mac fns
   ((f1 f2 ...)
    #`(case-lambda*
       #,@(map fn-xpnd #'(f1 f2 ...)))))
