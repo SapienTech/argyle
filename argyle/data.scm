@@ -1,4 +1,4 @@
-(module (argyle data)
+(ns (argyle data)
     :export (data trans data? data-type? data-type))
 (use (argyle base)
      (argyle data records)
@@ -27,13 +27,13 @@
   ((imm? (name (field ...)
                :init (mke arg ...) spec ...
                :app fn))
-   (let name' (dat #'name)
+   (let name' (syn->dat #'name)
      (w/syn (type (syn (+ '< name' '>) #'name)
-             %mke (syn (+ '% (dat #'mke)) #'name)
+             %mke (syn (+ '% (syn->dat #'mke)) #'name)
              pred (syn (+ name' '?) #'name)
              (app app: app!) (mke-app-spec name' #'name)
              self (syn 'self #'name))
-       #`(do (#,(if (dat #'imm?) #'define-immutable-record-type
+       #`(do (#,(if (syn->dat #'imm?) #'define-immutable-record-type
                   #'define-record-type)
               type
               (%mke arg ...) pred
@@ -41,7 +41,7 @@
               #,@(mke-field-specs name' #'(field ...) #'(spec ...) #'name)
               spec ...)
              (def mke args 
-               (#,(if (dat #'imm?) #'let #'ret)
+               (#,(if (syn->dat #'imm?) #'let #'ret)
                 self (apply %mke args) (app! self fn))))))))
 
 (def data-type? record-type?)
@@ -51,7 +51,7 @@
 
 (eval-when (expand load eval)
 
- (def std-mke (name) (syn (dat name) name))
+ (def std-mke (name) (syn (syn->dat name) name))
  
  (def mke-app-spec (name ctx)
    (syn (mke-field-spec name 'fn) ctx))
@@ -62,8 +62,8 @@
  
  (def mke-field-specs (name fields specs ctx)
    (syn (map (\\ mke-field-spec name _)
-             (set\ eq? (dat fields)
-                       (map first (dat specs)))) ctx))
+             (set\ eq? (syn->dat fields)
+                       (map first (syn->dat specs)))) ctx))
  (def not-app (name)
    (fn args (err "Wrong type to apply:" name
                  "data-type not applicable"))))

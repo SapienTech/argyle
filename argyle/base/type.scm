@@ -1,10 +1,10 @@
-(module (argyle base type)
+(ns (argyle base type)
   :export (base-type coerce))
 (use (argyle base mac)
      (argyle base fn)
      (argyle base ctrl)
      (argyle base err)
-     (argyle base module)
+     (argyle base ns)
      (argyle base type lst)
      (argyle base type str)
      (argyle base type num)
@@ -98,7 +98,7 @@
 
 (export-type-ctrs str num int sym syn dat chr)
 
-(re-export-modules 
+(re-export-ns 
  (argyle base type lst)
  (argyle base type str)
  (argyle base type num)

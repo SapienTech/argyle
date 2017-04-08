@@ -1,4 +1,4 @@
-(module (argyle base ctrl)
+(ns (argyle base ctrl)
     :replace (do = aif it & $> nil?))
 (use ((srfi srfi-1) :select (append-map lset-difference))
      (argyle guile)

@@ -1,4 +1,4 @@
-(module (argyle base type num))
+(ns (argyle base type num))
 (use (argyle base fn))
 
 (defp num? number?)

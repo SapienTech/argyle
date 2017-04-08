@@ -1,4 +1,4 @@
-(module (argyle data vec)
+(ns (argyle data vec)
   :export (<vec> vec vec? vec-fn vec-fn!))
 (use (argyle base)
      (argyle data)

@@ -1,4 +1,4 @@
-(module (argyle base type sym))
+(ns (argyle base type sym))
 (use (argyle base fn))
 (defp sym? symbol?)
 (defp sym->kwd symbol->keyword)

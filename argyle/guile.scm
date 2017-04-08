@@ -1,4 +1,4 @@
-(module (argyle guile))
+(ns (argyle guile))
 (export _+ _* _= _length _apply grp expand-kwargs has-kwargs?)
 (export-syntax _let cut)
 (use (srfi srfi-1)

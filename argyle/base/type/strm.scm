@@ -1,4 +1,4 @@
-(module (argyle base type strm))
+(ns (argyle base type strm))
 (use (argyle base fn)
      (argyle base mac)
      (argyle lib streams))

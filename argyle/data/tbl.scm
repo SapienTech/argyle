@@ -1,4 +1,4 @@
-(module (argyle data tbl)
+(ns (argyle data tbl)
   :export (<tbl> tbl tbl? tbl-t tbl-t! tbl-fn tbl-fn!))
 (use (argyle base)
      ((argyle guile) :select (grp))

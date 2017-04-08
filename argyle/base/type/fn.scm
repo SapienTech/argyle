@@ -1,4 +1,4 @@
-(module (argyle base type fn))
+(ns (argyle base type fn))
 (use (argyle base fn))
 
 (defp fun procedure)

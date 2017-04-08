@@ -1,4 +1,4 @@
-(module (argyle monad)
+(ns (argyle monad)
   :export (;; Monads.
             monad monad? monad-bind monad-return
 

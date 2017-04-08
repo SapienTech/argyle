@@ -1,11 +1,11 @@
-(module (argyle base module)
-    :export (re-export-modules))
+(ns (argyle base ns)
+    :export (re-export-ns))
 (use ((srfi srfi-1) :select (append-map))
      (argyle base mac)
      (argyle base fn))
 
 
-(mac re-export-modules x
+(mac re-export-ns x
   ((m ...)
    #`(re-export 
       #,@(datum->syntax x

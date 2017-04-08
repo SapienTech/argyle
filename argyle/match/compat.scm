@@ -1,4 +1,4 @@
-(module (argyle match compat)
+(ns (argyle match compat)
     :export (match
               match-lambda
               match-lambda*

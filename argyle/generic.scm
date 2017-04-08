@@ -1,4 +1,4 @@
-(module (argyle generic)
+(ns (argyle generic)
   :replace (map)
   :export (gen <gen-fn> gen-fn? xtnd type
            len rev join cpy clr! kth))
@@ -54,7 +54,7 @@
                 (if (tbl type) (tbl type)
                      (tbl type (mke-tbl)))))
         => (tbl 'rst (fn (#,@#'args . rest) body ...)))))
-  ((name (arg1 ...) body ...) (defd? (dat #'name))
+  ((name (arg1 ...) body ...) (defd? (syn->dat #'name))
    (let-syn (args types) (split #'(arg1 ...))
             ;; TODO: refactor
      #`(loop ((for type  (in-list 'types))
@@ -94,7 +94,7 @@
       (ret v (mke-vec (+ l1 l2))
         (vec->! v1 0 l1 v 0)
         (vec->! v2 0 l2 v l1))))
-(xtnd join (strms <strm>) (strm-join s1))
+(xtnd join (strms <strm>) (strm-join strms))
 
 (xtnd cpy (v <vec>) (vec-cpy v))
 (xtnd cpy (q <q>) (%mke-q (q-len q) (q-hd q) (q-tl q)))

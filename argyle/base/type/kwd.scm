@@ -1,4 +1,4 @@
-(module (argyle base type kwd))
+(ns (argyle base type kwd))
 (use (argyle base fn))
 
 (defp kwd? keyword?)

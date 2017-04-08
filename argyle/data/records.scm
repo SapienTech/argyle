@@ -1,4 +1,4 @@
-(module (argyle data records)
+(ns (argyle data records)
   :replace (record record? record-type?)
   :export (define-record-type))
 (use (srfi srfi-1)

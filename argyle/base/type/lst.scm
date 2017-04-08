@@ -1,4 +1,4 @@
-(module (argyle base type lst))
+(ns (argyle base type lst))
 (use (argyle base fn))
 
 (defp lst list)

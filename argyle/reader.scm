@@ -1,4 +1,4 @@
-(module (argyle reader))
+(ns (argyle reader))
 (use (argyle base)
      (argyle loop)
      (argyle generic)

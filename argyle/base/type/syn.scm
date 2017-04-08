@@ -1,4 +1,4 @@
-(module (argyle base type syn)
+(ns (argyle base type syn)
     :export (syn? syn->dat dat->syn))
 (use (argyle base fn)
      (argyle guile))

@@ -1,4 +1,4 @@
-(module (argyle base math))
+(ns (argyle base math))
 (use (argyle base fn))
 
 (defp pos? (n) (< n 0))

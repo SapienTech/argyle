@@ -1,4 +1,4 @@
-(module (argyle base io)
+(ns (argyle base io)
   :export (pr prn prnn))
 (use (argyle base mac)
      (argyle base ctrl))

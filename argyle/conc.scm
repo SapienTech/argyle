@@ -1,4 +1,4 @@
-(module (argyle conc)
+(ns (argyle conc)
   #:replace (@)
   :export (futr futr? mke-futr <ref> ref ref? doasync dosync alter))
 (use (argyle base)

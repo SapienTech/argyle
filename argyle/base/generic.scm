@@ -1,4 +1,4 @@
-(module (argyle base generic)
+(ns (argyle base generic)
   :replace (+ * length))
 (use (argyle guile)
      (argyle base fn)

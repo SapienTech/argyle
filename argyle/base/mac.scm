@@ -1,4 +1,4 @@
-(module (argyle base mac)
+(ns (argyle base mac)
     :export (mac mac? syn-case let-syn w/syn
                   syn-param w/syn-params gen-tmps))
 (use (argyle guile)

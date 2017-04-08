@@ -1,4 +1,4 @@
-(module (argyle base type str))
+(ns (argyle base type str))
 (use (argyle base fn))
 
 ;;; Standardize a macro for ref, set, copy, etc

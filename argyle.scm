@@ -1,5 +1,6 @@
-(module (argyle)
-  :duplicates (last))
+(ns (argyle)
+    :duplicates (last))
+
 (use (argyle base)
      (argyle match)
      (argyle data)
@@ -16,7 +17,7 @@
      (ice-9 receive)
      (srfi srfi-45))
 
-(re-export-modules
+(re-export-ns
  (argyle base)
  (argyle match)
  (argyle data)

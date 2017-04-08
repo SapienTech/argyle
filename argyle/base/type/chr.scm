@@ -1,4 +1,4 @@
-(module (argyle base type chr))
+(ns (argyle base type chr))
 (use (argyle base fn))
 
 (defp chr? char?)

@@ -1,4 +1,4 @@
-(module (argyle fibers))
+(ns (argyle fibers))
 (use (fibers)
      (fibers internal)
      (argyle base))

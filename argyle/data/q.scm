@@ -1,4 +1,4 @@
-(module (argyle data q)
+(ns (argyle data q)
   :export (<q> q mke-q %mke-q q? q-nil?
             q-pk enq! deq!
             q-hd q-hd! q-tl q-tl! q-len q-len! q-fn q-fn!

@@ -1,4 +1,4 @@
-(module (argyle base err))
+(ns (argyle base err))
 (use (argyle base fn))
 
 (defp err error)

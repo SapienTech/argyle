@@ -22,7 +22,7 @@
 
 ;;; Code:
 
-(module (argyle data immutable)
+(ns (argyle data immutable)
   :export (set-record-type-printer!
             define-immutable-record-type
             set-field

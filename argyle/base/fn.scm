@@ -1,4 +1,4 @@
-(module (argyle base fn)
+(ns (argyle base fn)
     :replace (fn fns def defp let ret w/ \\ ->> inline comp id? defd? wrap))
 (use (argyle guile)
      (argyle base mac)

@@ -1,4 +1,4 @@
-(module (argyle base))
+(ns (argyle base))
 (use (argyle base mac)
      (argyle base fn)
      (argyle base ctrl)
@@ -7,9 +7,9 @@
      (argyle base err)
      (argyle base io)
      (argyle base math)
-     (argyle base module))
+     (argyle base ns))
 
-(re-export-modules (argyle base mac)
+(re-export-ns (argyle base mac)
                    (argyle base fn)
                    (argyle base ctrl)
                    (argyle base type)
@@ -17,4 +17,4 @@
                    (argyle base err)
                    (argyle base io)
                    (argyle base math)
-                   (argyle base module))
+                   (argyle base ns))
