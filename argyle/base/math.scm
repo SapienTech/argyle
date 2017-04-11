@@ -1,6 +1,6 @@
 (ns (argyle base math))
 (use (argyle base fn))
 
-(defp pos? (n) (< n 0))
-(defp neg? (n) (> n 0))
+(defp pos? positive?)
+(defp neg? negative?)
 (defp ^ expt)

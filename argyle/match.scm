@@ -1,5 +1,5 @@
 (ns (argyle match))
-(export-syntax w/ let def)
+(export-syntax w/ let def fn fn-case)
 (use (argyle base)
      ((argyle base fn)
       :select ((def . _def)
@@ -16,7 +16,7 @@
   ((args b1 b2 ...)
    #`(_fn #,@(fn-match #'(args b1 b2 ...)))))
 
-(mac fns
+(mac fn-case
   ((((pat ... . rst) b1 b2 ...) ...)
    #`(_fns
       #,@(map fn-match
