@@ -1,6 +1,7 @@
 (ns (argyle data tbl)
   :export (<tbl> tbl tbl? tbl-t tbl-t! tbl-fn tbl-fn!))
 (use (argyle base)
+     (argyle loop)
      ((argyle guile) :select (grp))
      (argyle data))
 
@@ -38,3 +39,18 @@
 (defp tbl-fold (f init t) (hash-fold fun init (t)))
 (defp tbl-each (f t) (hash-for-each fun (t)))
 (defp tbl-map->lst (f t) (hash-map->list f (t)))
+
+(defp update (t k fn)
+  (t k (fn (t k))))
+
+(def ifcons (head tail)
+  (if tail (cons head tail)
+      (lst head)))
+
+(defp grp-by (pred seq)
+  (loop ((for elt (in-list seq))
+         (where t (tbl)
+                (update t (pred elt)
+                        (\\ ifcons elt _))))
+    => (tbl-map->lst (fn (k v) (lst k (reverse v)))
+                     t)))
