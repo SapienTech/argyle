@@ -1,7 +1,9 @@
 (ns (argyle base io)
   :export (pr prn prnn))
 (use (argyle base mac)
-     (argyle base ctrl))
+     (argyle base fn)
+     (argyle base ctrl)
+     (ice-9 pretty-print))
 
 (mac pr
   ((v1) #'(display v1))
@@ -13,3 +15,8 @@
 (mac prnn
   ((v1) #'(prn v1))
   ((v1 v2 ...) #'(do (prn v1) (prnn v2 ...))))
+
+(defp pprn pretty-print)
+
+(defp format (str . args)
+  (apply format str #t args))
