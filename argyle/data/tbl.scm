@@ -36,8 +36,8 @@
 
 (defp tbl-cnt (pred t) (hash-count pred (t)))
 (defp tbl-clr! (t) (hash-clear! (t)))
-(defp tbl-fold (f init t) (hash-fold fun init (t)))
-(defp tbl-each (f t) (hash-for-each fun (t)))
+(defp tbl-fold (f init t) (hash-fold f init (t)))
+(defp tbl-each (f t) (hash-for-each f (t)))
 (defp tbl-map->lst (f t) (hash-map->list f (t)))
 
 (defp update (t k fn)

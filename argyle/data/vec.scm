@@ -23,7 +23,9 @@
 (defp lst->vec (lst) (%mke-vec (list->vector lst)))
 (defp vec-cpy (v) (%mke-vec (vector-copy (v))))
 (defp vec-fill! (v fill) (vector-fill! (v) fill))
-(defp vec<-! (v1 s1 e1 v2 s2) (vector-move-left! (v1) s1 e1 (v2) s2))
-(defp vec->! (v1 s1 e1 v2 s2) (vector-move-right! (v1) s1 e1 (v2) s2))
-(defp vec-map (fun v . vs) (apply vector-map fun (v) (map (fn (v) (v)) vs)))
+(defp vec-map (f v . vs)
+  (%mke-vec
+   (apply vector-map (fn (i e1 . es) (apply f e1 es))
+          (v)
+          (map (fn (v) (v)) vs))))
 ;;; Etc...

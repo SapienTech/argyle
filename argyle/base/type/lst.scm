@@ -1,8 +1,11 @@
 (ns (argyle base type lst))
-(use (argyle base fn))
+(use (argyle base fn)
+     (srfi srfi-1))
+(export filter reduce)
 
 (defp lst list)
 (defp lst? list?)
+(defp empty? null?)
 (defp lst-> list->array)
 (defp lst-> list->bitvector)
 (defp lst-> list->char-set)
@@ -17,4 +20,7 @@
 (defp lst! list-set!)
 (defp lst-hd list-head)
 (defp lst-tl list-tail)
+(defp unique delete-duplicates)
+(defp unique! delete-duplicates!)
 
+(defp range iota)
