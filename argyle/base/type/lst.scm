@@ -22,5 +22,4 @@
 (defp lst-tl list-tail)
 (defp unique delete-duplicates)
 (defp unique! delete-duplicates!)
-
 (defp range iota)

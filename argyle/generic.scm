@@ -1,6 +1,7 @@
 (ns (argyle generic)
   :export (gen <gen-fn> gen-fn? xtnd type
-           len rev join cpy clr! kth))
+           str len rev join cpy clr!
+           map))
 (use (argyle base)
      ((argyle base type)
       :select ((str . _str)))
@@ -47,15 +48,15 @@
 (mac xtnd x
   (def split (lst)
     (c/vals (fn () (unzip2 (grp lst 2))) list))
-  ((name (arg1 ... . rest) body ...) (~(nil? #'rest))
+  ((fn-name (arg1 ... . rest) body ...) (~(nil? #'rest))
    (let-syn (args types) (split #'(arg1 ...))
      #`(loop ((for type  (in-list 'types))
-              (where type-tree (gen-fn-tbl name)
+              (where type-tree (gen-fn-tbl fn-name)
                 (or (type-tree type)
                     (do (type-tree type (mke-tbl))
                         (type-tree type)))))
         => (type-tree 'rst (fn (#,@#'args . rest) body ...)))))
-  ((fn-name (arg1 ...) body ...) (defd? (syn->dat #'fn-name))
+  ((fn-name (arg1 ...) body ...)
    (let-syn (args types) (split #'(arg1 ...))
             ;; TODO: refactor
      #`(loop ((for type (in-list 'types))
@@ -80,10 +81,7 @@
 (defp str args
   (reduce-right str-join "" (map _str args)))
 
-(xtnd len (t <tbl>) (tbl-cnt (const #t) t))
-(xtnd len (v <vec>) (vec-len v))
-(xtnd len (q <q>) (q-len q))
-(xtnd len (stream <strm>) (strm-len stream))
+(xtnd len (n <int>) (length (str n)))
 
 (xtnd rev (s <str>) (string-reverse s))
 
@@ -103,3 +101,10 @@
 (xtnd take (seq <strm> k <int>) (strm-take k seq))
 (xtnd drop (seq <strm> k <int>) (strm-drop k seq))
 (xtnd kth (seq <vec> k <int>) (seq k))
+
+;;; Collections
+
+(gen map (@ (srfi srfi-1) map))
+(xtnd map (f <fn> v <vec>) (vec-map f v))
+(xtnd map (f <fn> s <str> . rst) (apply str-map f s rst))
+(xtnd map (f <fn> t <tbl>) (tbl-map->lst f t))
