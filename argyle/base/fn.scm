@@ -51,7 +51,7 @@
 
 ;;; Replace w/ => when loop export is handled
 (mac ->>
-  ((exp fn ...) #'((compose fn ...) exp)))
+  ((exp f ...) #`((compose #,@(reverse #'(f ...))) exp)))
 
 (mac inline
   ((name (arg ...) body ...)
