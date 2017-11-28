@@ -91,8 +91,8 @@
   (_def fn-match (exp)
     (syn-case exp ()
       (((pat ... . rst) b1 b2 ...)
-       (let-syn pat:exps #`(#,@(parse-params #'(pat ...)) . rst)
-         #`(#,(map cadr #'pat:exps)
+       (let-syn pat:exps (parse-params #'(pat ...))
+         #`((#,@(map cadr #'pat:exps) . rst)
             (match-xpnd #,(splice #'pat:exps) b1 b2 ...))))))
   
   ;; TODO: mac instead?
